@@ -21,7 +21,7 @@ let initialConnection = true;
 
 // 🧠 Extract session from base64 zip
 async function extractSessionFromEnv() {
-  const encoded = config.SESSION_ID?.split("ARSLANMD~")[1];
+  const encoded = config.SESSION_ID?.split("ARSL~")[1];
   if (!encoded) {
     console.error("❌ Invalid SESSION_ID format");
     return false;
