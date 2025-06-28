@@ -1,6 +1,6 @@
-name: BERA-TECH 
+name: ArslanMD Official
 services:
-  - name: BERA-TECH-SERVICE
+  - name: ARSLAN-MD-SERVICE
     type: web
     ports:
       - 5000
