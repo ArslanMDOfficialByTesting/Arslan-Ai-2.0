@@ -56,7 +56,7 @@ async function downloadSessionData() {
         return false;
     }
 
-    const sessdata = config.SESSION_ID.split("KSMD~")[1];
+    const sessdata = config.SESSION_ID.split("ARSLANMD~")[1];
 
     if (!sessdata || !sessdata.includes("#")) {
         console.error('❌ Invalid SESSION_ID format! It must contain both file ID and decryption key.');
@@ -89,13 +89,13 @@ async function start() {
     try {
         const { state, saveCreds } = await useMultiFileAuthState(sessionDir);
         const { version, isLatest } = await fetchLatestBaileysVersion();
-        console.log(`🤖 KING-SANDESH-MD-V2 using WA v${version.join('.')}, isLatest: ${isLatest}`);
+        console.log(`🤖 Arslan-Ai-2.0 using WA v${version.join('.')}, isLatest: ${isLatest}`);
         
         const Matrix = makeWASocket({
             version,
             logger: pino({ level: 'silent' }),
             printQRInTerminal: useQR,
-            browser: ["KING-SANDESH-MD", "safari", "3.3"],
+            browser: ["Arslan-Ai-2.0", "safari", "3.3"],
             auth: state,
             getMessage: async (key) => {
                 if (store) {
@@ -114,7 +114,7 @@ Matrix.ev.on('connection.update', (update) => {
         }
     } else if (connection === 'open') {
         if (initialConnection) {
-            console.log(chalk.green("Connected Successfully KING-SANDESH-MD 🤍"));
+            console.log(chalk.green("Connected Successfully Arslan-Ai-2.0 🤍"));
             Matrix.sendMessage(Matrix.user.id, { 
                 image: { url: "https://imgur.com/a/jgZN1dp" }, 
                 caption: `> 𝐂ᴏɴɴᴇᴄᴛᴇ𝐃 𝐒ᴜᴄᴄᴇꜱꜱꜰᴜʟʟ𝐘 🩷🎀 .
@@ -202,7 +202,7 @@ Matrix.ev.on('connection.update', (update) => {
   }        
           //=============readstatus=======                         
             if (config.AUTO_STATUS_REPLY) {
-                const customMessage = config.STATUS_READ_MSG || '✅ Auto Status Seen Bot By Mr.Sandesh Bhashana';
+                const customMessage = config.STATUS_READ_MSG || '✅ Auto Status Seen Bot By ArslanMD Official';
                 await Matrix.sendMessage(fromJid, { text: customMessage }, { quoted: mek });
             }
         }
