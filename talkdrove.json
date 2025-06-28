@@ -1,10 +1,10 @@
 {
-    "bot-name": "KING-SANDESH-MD",
-    "description": "Whiskey Sockets Baileys Whatsapp bot By Mr Unknown",
+    "bot-name": "Arslan-Ai-2.0",
+    "description": "Whiskey Sockets Baileys Whatsapp bot By ArslanMD Official",
     "logo": "https://files.catbox.moe/b5se6o.mp4",
     "keywords": ["bot"],
     "documentation-link": "https://cloud-tech-tces.onrender.com/",
-    "owner-verification": "mrsandeshbhashana@gmail.com",
+    "owner-verification": "arslanmdofficial@gmail.com",
   
     "env": {
       "SESSION_ID": {
@@ -24,7 +24,7 @@
     "STICKER_NAME": {
       "description": "type your sticker pack name.",
       "required": false,
-      "value": "<| 𝐌𝐑 𝐔𝐍𝐊𝐍𝐎𝐖𝐍 🫧"
+      "value": "<| Arslan-Ai-2.0 🫧"
   
     },
     
@@ -76,27 +76,27 @@
     "AUTO_STATUS_MSG": {
       "description": "Type custom message on status reply",
       "required": true,
-      "value": "*<| 𝐊𝐈𝐍𝐆-𝐒𝐀𝐍𝐃𝐄𝐒𝐇-𝐌𝐃 𝐕❷🫧 𝑩𝒐𝒕 𝑽𝒊𝒆𝒘𝒆𝒅 𝒀𝒐𝒖𝒓 𝑺𝒕𝒂𝒕𝒖𝒔 🦄*"
+      "value": "*<| Arslan-Ai-2.0 𝐕❷🫧 𝑩𝒐𝒕 𝑽𝒊𝒆𝒘𝒆𝒅 𝒀𝒐𝒖𝒓 𝑺𝒕𝒂𝒕𝒖𝒔 🦄*"
    
      }, 
     
     "OWNER_NAME": {
       "description": "Type Bot Owner Name.",
       "required": false,
-      "value": "<| 𝐌𝐑 𝐔𝐍𝐊𝐍𝐎𝐖𝐍 🫧"
+      "value": "<| Arslan-Ai-2.0 🫧"
 }, 
 
     "OWNER_NUMBER": {
       "description": "put the owner number for bot.",
       "required": false,
-      "value": "94741259325"
+      "value": "923237045919"
 
     }, 
 
     "BOT_NAME": {
       "description": "Type here the bot name.",
       "required": false,
-      "value": "<| 𝐊𝐈𝐍𝐆-𝐒𝐀𝐍𝐃𝐄𝐒𝐇-𝐌𝐃 𝐕❷🫧"
+      "value": "<| Arslan-Ai-2.0 𝐕❷🫧"
 
       }, 
 
@@ -116,7 +116,7 @@
      "DESCRIPTION": {
       "description": "add caption for menu and other",
       "required": false,
-      "value": "> *© Powered By King-Sandesh Md V2 💸*"
+      "value": "> *© Powered By ArslanMD Official 💸*"
     },
 
       "DELETE_LINKS": {
