@@ -1,246 +1,98 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import {
-    makeWASocket,
-    Browsers,
-    fetchLatestBaileysVersion,
-    DisconnectReason,
-    useMultiFileAuthState,
-} from '@whiskeysockets/baileys';
-import { Handler, Callupdate, GroupUpdate } from './data/index.js';
-import express from 'express';
-import pino from 'pino';
+import unzipper from 'unzipper';
 import fs from 'fs';
-import { File } from 'megajs';
-import NodeCache from 'node-cache';
 import path from 'path';
+import pino from 'pino';
+import express from 'express';
 import chalk from 'chalk';
-import moment from 'moment-timezone';
-import axios from 'axios';
+import { makeWASocket, useMultiFileAuthState, fetchLatestBaileysVersion, DisconnectReason, Browsers } from '@whiskeysockets/baileys';
 import config from './config.cjs';
-import pkg from './lib/autoreact.cjs';
-const { emojis, doReact } = pkg;
-const prefix = process.env.PREFIX || config.PREFIX;
-const sessionName = "session";
+
+// ⬇️ Paths
+const sessionDir = path.join('./session');
+const credsPath = path.join(sessionDir, 'creds.json');
 const app = express();
-const orange = chalk.bold.hex("#FFA500");
-const lime = chalk.bold.hex("#32CD32");
-let useQR = false;
-let initialConnection = true;
 const PORT = process.env.PORT || 3000;
 
-const MAIN_LOGGER = pino({
-    timestamp: () => `,"time":"${new Date().toJSON()}"`
-});
-const logger = MAIN_LOGGER.child({});
-logger.level = "trace";
+let useQR = false;
+let initialConnection = true;
 
-const msgRetryCounterCache = new NodeCache();
-
-const __filename = new URL(import.meta.url).pathname;
-const __dirname = path.dirname(__filename);
-
-const sessionDir = path.join(__dirname, 'session');
-const credsPath = path.join(sessionDir, 'creds.json');
-
-if (!fs.existsSync(sessionDir)) {
-    fs.mkdirSync(sessionDir, { recursive: true });
-}
-
-async function downloadSessionData() {
-    console.log("Debugging SESSION_ID:", config.SESSION_ID);
-
-    if (!config.SESSION_ID) {
-        console.error('❌ Please add your session to SESSION_ID env !!');
-        return false;
-    }
-
-    const sessdata = config.SESSION_ID.split("ARSLANMD~")[1];
-
-    if (!sessdata || !sessdata.includes("#")) {
-        console.error('❌ Invalid SESSION_ID format! It must contain both file ID and decryption key.');
-        return false;
-    }
-
-    const [fileID, decryptKey] = sessdata.split("#");
-
-    try {
-        console.log("🔄 Downloading Session...");
-        const file = File.fromURL(`https://mega.nz/file/${fileID}#${decryptKey}`);
-
-        const data = await new Promise((resolve, reject) => {
-            file.download((err, data) => {
-                if (err) reject(err);
-                else resolve(data);
-            });
-        });
-
-        await fs.promises.writeFile(credsPath, data);
-        console.log("🔒 Session Successfully Loaded !!");
-        return true;
-    } catch (error) {
-        console.error('❌ Failed to download session data:', error);
-        return false;
-    }
-}
-
-async function start() {
-    try {
-        const { state, saveCreds } = await useMultiFileAuthState(sessionDir);
-        const { version, isLatest } = await fetchLatestBaileysVersion();
-        console.log(`🤖 Arslan-Ai-2.0 using WA v${version.join('.')}, isLatest: ${isLatest}`);
-        
-        const Matrix = makeWASocket({
-            version,
-            logger: pino({ level: 'silent' }),
-            printQRInTerminal: useQR,
-            browser: ["Arslan-Ai-2.0", "safari", "3.3"],
-            auth: state,
-            getMessage: async (key) => {
-                if (store) {
-                    const msg = await store.loadMessage(key.remoteJid, key.id);
-                    return msg.message || undefined;
-                }
-                return { conversation: "king sandesh ai whatsapp user bot" };
-            }
-        });
-
-Matrix.ev.on('connection.update', (update) => {
-    const { connection, lastDisconnect } = update;
-    if (connection === 'close') {
-        if (lastDisconnect.error?.output?.statusCode !== DisconnectReason.loggedOut) {
-            start();
-        }
-    } else if (connection === 'open') {
-        if (initialConnection) {
-            console.log(chalk.green("Connected Successfully Arslan-Ai-2.0 🤍"));
-            Matrix.sendMessage(Matrix.user.id, { 
-                image: { url: "https://imgur.com/a/jgZN1dp" }, 
-                caption: `> 𝐂ᴏɴɴᴇᴄᴛᴇ𝐃 𝐒ᴜᴄᴄᴇꜱꜱꜰᴜʟʟ𝐘 🩷🎀 .
-╭───❍「 *𝐂ᴏɴɴᴇᴄᴛᴇ𝐃 𝐁ᴏᴛ* 」
-┃ <| 𝐊𝐈𝐍𝐆-𝐒𝐀𝐍𝐃𝐄𝐒𝐇-𝐌𝐃 𝐕❷🫧
-╰───────────❍
-╭───❍「 *𝐁ᴏᴛ 𝐖ᴇʙ 𝐏ᴀɢᴇ* 」
-┃ [**Here**](https://king-sandesh-md-ofc-web.pages.dev/) visit web...!
-╰───────────❍
-╭───❍「 *𝐉ᴏɪɴ 𝐂ʜᴀɴɴᴇ𝐋* 」
-┃ [**Here**](https://whatsapp.com/channel/0029Vb5saAU4Y9lfzhgBmS2N) to join..!
-╰───────────❍
-╭───❍「 *𝐁ᴏᴛ 𝐎ᴡɴᴇ𝐑* 」
-┃ 𝐌𝐑 .𝐒ᴀɴᴅᴇꜱ𝐇 𝐁ʜᴀꜱʜᴀɴ𝐀
-╰───────────❍
-╭───❍「 *𝐒ʏꜱᴛᴇᴍ 𝐒ᴛᴀᴛᴜꜱ* 」
-┃ ░░░░░░░░░░░░░░░░░░░ 100%
-╰───────────❍
-╭───❍「 *𝐁ᴏᴛ 𝐏ʀᴇꜰɪ𝐱* 」
-┃ 𝐂ᴏɴꜰɪɢᴜʀ𝐄 𝐘ᴏᴜʀ 𝐏ʀᴇꜰɪ𝐗 ${prefix}
-╰───────────❍
-╭───❍「 *𝐀ᴜᴛᴏᴍᴀᴛɪᴏ𝐍 𝐏ᴏᴡᴇʀᴇᴅ 𝐁ʏ* 」
-┃ 𝐊ɪɴɢ 𝐒ᴀɴᴅᴇꜱʜ 𝐌ᴅ 𝐕❷
-╰───────────❍`
-            });
-            initialConnection = false;
-        } else {
-            console.log(chalk.blue("♻️ Connection reestablished after restart."));
-        }
-    }
-});
-        
-        Matrix.ev.on('creds.update', saveCreds);
-
-        Matrix.ev.on("messages.upsert", async chatUpdate => await Handler(chatUpdate, Matrix, logger));
-        Matrix.ev.on("call", async (json) => await Callupdate(json, Matrix));
-        Matrix.ev.on("group-participants.update", async (messag) => await GroupUpdate(Matrix, messag));
-
-        if (config.MODE === "public") {
-            Matrix.public = true;
-        } else if (config.MODE === "private") {
-            Matrix.public = false;
-        }
-
-        Matrix.ev.on('messages.upsert', async (chatUpdate) => {
-            try {
-                const mek = chatUpdate.messages[0];
-                console.log(mek);
-                if (!mek.key.fromMe && config.AUTO_REACT) {
-                    console.log(mek);
-                    if (mek.message) {
-                        const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
-                        await doReact(randomEmoji, mek, Matrix);
-                    }
-                }
-            } catch (err) {
-                console.error('Error during auto reaction:', err);
-            }
-        });
-        
-        Matrix.ev.on('messages.upsert', async (chatUpdate) => {
-    try {
-        const mek = chatUpdate.messages[0];
-        const fromJid = mek.key.participant || mek.key.remoteJid;
-        if (!mek || !mek.message) return;
-        if (mek.key.fromMe) return;
-        if (mek.message?.protocolMessage || mek.message?.ephemeralMessage || mek.message?.reactionMessage) return; 
-        if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_STATUS_SEEN) {
-            await Matrix.readMessages([mek.key]);     
-              //=============readstatus======= 
-        if (config.READ_MESSAGE === 'true') {
-    await conn.readMessages([mek.key]);  // Mark message as read
-    console.log(`Marked message from ${mek.key.remoteJid} as read.`);
+// 🧠 Extract session from base64 zip
+async function extractSessionFromEnv() {
+  const encoded = config.SESSION_ID?.split("ARSLANMD~")[1];
+  if (!encoded) {
+    console.error("❌ Invalid SESSION_ID format");
+    return false;
   }
-        if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_STATUS_REACT === "true"){
-               const jawadlike = await conn.decodeJid(conn.user.id);
-               const emojis = ['❤️', '💸', '😇', '🍂', '💥', '💯', '🔥', '💫', '💎', '💗', '🤍', '🖤', '👀', '🙌', '🙆', '🚩', '🥰', '💐', '😎', '🤎', '✅', '🫀', '🧡', '😁', '😄', '🌸', '🕊️', '🌷', '⛅', '🌟', '🗿', '🇵🇰', '💜', '💙', '🌝', '🖤', '🎎', '🎏', '🎐', '⚽', '🧣', '🌿', '⛈️', '🌦️', '🌚', '🌝', '🙈', '🙉', '🦖', '🐤', '🎗️', '🥇', '👾', '🔫', '🐝', '🦋', '🍓', '🍫', '🍭', '🧁', '🧃', '🍿', '🍻', '🎀', '🧸', '👑', '〽️', '😳', '💀', '☠️', '👻', '🔥', '♥️', '👀', '🐼'];
-               const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
-    await conn.sendMessage(mek.key.remoteJid, {
-      react: {
-        text: randomEmoji,
-        key: mek.key,
-      } 
-    }, { statusJidList: [mek.key.participant, jawadlike] });
-  }        
-          //=============readstatus=======                         
-            if (config.AUTO_STATUS_REPLY) {
-                const customMessage = config.STATUS_READ_MSG || '✅ Auto Status Seen Bot By ArslanMD Official';
-                await Matrix.sendMessage(fromJid, { text: customMessage }, { quoted: mek });
-            }
-        }
-    } catch (err) {
-        console.error('Error handling messages.upsert event:', err);
-    }
-});
 
-    } catch (error) {
-        console.error('Critical Error:', error);
-        process.exit(1);
-    }
+  try {
+    const buffer = Buffer.from(encoded, 'base64');
+    await fs.promises.mkdir(sessionDir, { recursive: true });
+
+    await unzipper.Open.buffer(buffer)
+      .then((d) => d.extract({ path: sessionDir, concurrency: 5 }));
+
+    console.log("✅ Session extracted successfully.");
+    return true;
+  } catch (err) {
+    console.error("❌ Failed to extract session:", err);
+    return false;
+  }
+}
+
+async function startBot() {
+  try {
+    const { state, saveCreds } = await useMultiFileAuthState(sessionDir);
+    const { version } = await fetchLatestBaileysVersion();
+
+    const sock = makeWASocket({
+      auth: state,
+      logger: pino({ level: 'silent' }),
+      printQRInTerminal: useQR,
+      browser: Browsers.macOS('Safari'),
+      version,
+    });
+
+    sock.ev.on('creds.update', saveCreds);
+
+    sock.ev.on('connection.update', ({ connection, lastDisconnect }) => {
+      if (connection === 'close' && lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut) {
+        console.log('Reconnecting...');
+        startBot();
+      } else if (connection === 'open') {
+        console.log(chalk.green("✅ Connected to WhatsApp successfully!"));
+        initialConnection = false;
+      }
+    });
+
+    // Add more events here like messages.upsert etc...
+
+  } catch (err) {
+    console.error("❌ Critical bot error:", err);
+    process.exit(1);
+  }
 }
 
 async function init() {
-    if (fs.existsSync(credsPath)) {
-        console.log("🔒 Session file found, proceeding without QR code.");
-        await start();
+  if (fs.existsSync(credsPath)) {
+    console.log("🔐 Session already exists. Starting...");
+    await startBot();
+  } else {
+    const extracted = await extractSessionFromEnv();
+    if (extracted) {
+      await startBot();
     } else {
-        const sessionDownloaded = await downloadSessionData();
-        if (sessionDownloaded) {
-            console.log("🔒 Session downloaded, starting bot.");
-            await start();
-        } else {
-            console.log("No session found or downloaded, QR code will be printed for authentication.");
-            useQR = true;
-            await start();
-        }
+      useQR = true;
+      console.log("⚠️ No session found. Showing QR for pairing...");
+      await startBot();
     }
+  }
 }
 
 init();
 
-app.get('/', (req, res) => {
-    res.send('Hello World!');
-});
-
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
-
+// Express app (optional)
+app.get('/', (_, res) => res.send('Arslan-Ai-2.0 is live 🚀'));
+app.listen(PORT, () => console.log(`🌐 Bot running on port ${PORT}`));
