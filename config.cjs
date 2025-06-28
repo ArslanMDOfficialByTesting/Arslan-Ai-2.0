@@ -5,10 +5,10 @@ require("dotenv").config();
 const config = {
   SESSION_ID: process.env.SESSION_ID || "",
   PREFIX: process.env.PREFIX || '.',
-  BOT_NAME: process.env.BOT_NAME || "<| 𝐊𝐈𝐍𝐆-𝐒𝐀𝐍𝐃𝐄𝐒𝐇-𝐌𝐃 𝐕❷🫧",
+  BOT_NAME: process.env.BOT_NAME || "<| Arslan-Ai-2.0 𝐕❷🫧",
   BOT: process.env.BOT || "hello 👋",
   NEW_CMD: process.env.NEW_CMD || "ᴀᴅᴅᴠᴀʀ\n│ sᴜᴅᴏ\n| bright",
-  CAPTION: process.env.CAPTION || "> *© Powered By King-Sandesh-Md V2 💸*",
+  CAPTION: process.env.CAPTION || "> *© Powered By ArslanMD Official💸*",
   AUTO_STATUS_SEEN: process.env.AUTO_STATUS_SEEN !== undefined ? process.env.AUTO_STATUS_SEEN === 'true' : true,
   AUTO_BIO: process.env.AUTO_BIO !== undefined ? process.env.AUTO_BIO === 'true' : true,
   AUTO_STATUS_REACT: process.env.AUTO_STATUS_REACT !== undefined ? process.env.AUTO_STATUS_REACT === 'false' : true,
@@ -32,17 +32,17 @@ const config = {
   REJECT_CALL: process.env.REJECT_CALL !== undefined ? process.env.REJECT_CALL === 'false' : false, 
   NOT_ALLOW: process.env.NOT_ALLOW !== undefined ? process.env.NOT_ALLOW === 'true' : true,
   MODE: process.env.MODE || "public",
-  DELETED_MESSAGES_CHAT_ID: process.env.DELETED_MESSAGES_CHAT_ID || "94741259325@s.whatsapp.net",
-  OWNER_NAME: process.env.OWNER_NAME || "<| 𝐌𝐑 𝐔𝐍𝐊𝐍𝐎𝐖𝐍 🫧",
-  OWNER_NUMBER: process.env.OWNER_NUMBER || "94741259325",
-  SUDO_NUMBER: process.env.SUDO_NUMBER || "94741259325",
+  DELETED_MESSAGES_CHAT_ID: process.env.DELETED_MESSAGES_CHAT_ID || "923237045919@s.whatsapp.net",
+  OWNER_NAME: process.env.OWNER_NAME || "<| ArslanMD Official 🫧",
+  OWNER_NUMBER: process.env.OWNER_NUMBER || "923237045919",
+  SUDO_NUMBER: process.env.SUDO_NUMBER || "923237045919",
   GEMINI_KEY: process.env.GEMINI_KEY || "AIzaSyCUPaxfIdZawsKZKqCqJcC-GWiQPCXKTDc",
   WELCOME: process.env.WELCOME !== undefined ? process.env.WELCOME === 'true' : false,
 
   // New additions for status command
   STATUS: process.env.STATUS !== undefined ? process.env.STATUS === 'true' : false,  // enable/disable status feature
   DEPLOY_DATE: process.env.DEPLOY_DATE || "2025-07-01",                         // deployment date (YYYY-MM-DD)
-  TARGET_NUMBER: process.env.TARGET_NUMBER || "94741259325"                    // target phone number for status messages
+  TARGET_NUMBER: process.env.TARGET_NUMBER || "923237045919"                    // target phone number for status messages
 };
 
 module.exports = config;
