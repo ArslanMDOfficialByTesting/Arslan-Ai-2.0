@@ -1,42 +1,32 @@
-const config = require('../config.cjs');
+import configModule from '../config.cjs';
+const config = configModule.default || configModule;
 
-const autotypingCommand = async (m, Matrix) => {
+const autochatbot = async (m, Matrix) => {
   const botNumber = await Matrix.decodeJid(Matrix.user.id);
-  const isCreator = [botNumber, `${config.OWNER_NUMBER}@s.whatsapp.net`].includes(m.sender);
-  const prefix = config.PREFIX || '.';
+  const isCreator = [botNumber, config.OWNER_NUMBER + '@s.whatsapp.net'].includes(m.sender);
+  const prefix = config.PREFIX;
+  const cmd = m.body.startsWith(prefix) ? m.body.slice(prefix.length).split(' ')[0].toLowerCase() : '';
+  const text = m.body.slice(prefix.length + cmd.length).trim();
 
-  const fullCommand = m.body.startsWith(prefix) ? m.body.slice(prefix.length).trim() : '';
-  const cmd = fullCommand.split(' ')[0]?.toLowerCase();
-  const text = fullCommand.slice(cmd.length).trim().toLowerCase();
-
-  // Allowed aliases
-  const validCommands = ['chatbot', 'lydea', 'lydia', 'answer', 'automreply'];
+  const validCommands = ['chatbot', 'automreply', 'lydia', 'lydea'];
 
   if (validCommands.includes(cmd)) {
-    if (!isCreator) {
-      return m.reply("👺 *Only the bot owner can use this command.*");
-    }
+    if (!isCreator) return m.reply("*📛 THIS IS AN OWNER COMMAND*");
 
-    let message = '';
-    const status = text === 'on' ? true : text === 'off' ? false : null;
+    let responseMessage;
 
-    if (status === true) {
+    if (text === 'on') {
       config.CHAT_BOT = true;
-      message = `✅ *${cmd.toUpperCase()} is now Enabled.*\nBot will auto-reply to messages.`;
-    } else if (status === false) {
+      responseMessage = "✅ Chatbot enabled.";
+    } else if (text === 'off') {
       config.CHAT_BOT = false;
-      message = `🛑 *${cmd.toUpperCase()} is now Disabled.*\nBot won't auto-reply anymore.`;
+      responseMessage = "❌ Chatbot disabled.";
     } else {
-      message = `🌩️ *Usage:*\n${prefix}${cmd} on\n${prefix}${cmd} off`;
+      responseMessage = "🌩️ Usage:\n- chatbot on\n- chatbot off";
     }
 
-    try {
-      await Matrix.sendMessage(m.from, { text: message }, { quoted: m });
-    } catch (error) {
-      console.error(`[❌ ERROR]:`, error);
-      await Matrix.sendMessage(m.from, { text: '⚠️ Error while processing your request.' }, { quoted: m });
-    }
+    await Matrix.sendMessage(m.from, { text: responseMessage }, { quoted: m });
   }
 };
 
-export default autotypingCommand;
+export default autochatbot;
