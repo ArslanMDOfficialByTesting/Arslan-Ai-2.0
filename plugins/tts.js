@@ -1,5 +1,5 @@
 import axios from 'axios';
-import config from '../../config.cjs';
+const config = require('../config.cjs');
 
 const ttsHandler = async (m, sock) => {
   try {
