@@ -3,25 +3,33 @@ const config = require('../config.cjs');
 const block = async (m, gss) => {
   try {
     const botNumber = await gss.decodeJid(gss.user.id);
-  const isCreator = [botNumber, config.OWNER_NUMBER + '@s.whatsapp.net'].includes(m.sender);
+    const isCreator = [botNumber, config.OWNER_NUMBER + '@s.whatsapp.net'].includes(m.sender);
     const prefix = config.PREFIX;
-const cmd = m.body.startsWith(prefix) ? m.body.slice(prefix.length).split(' ')[0].toLowerCase() : '';
-const text = m.body.slice(prefix.length + cmd.length).trim();
+    const cmd = m.body.startsWith(prefix) ? m.body.slice(prefix.length).split(' ')[0].toLowerCase() : '';
+    const text = m.body.slice(prefix.length + cmd.length).trim();
 
-    const validCommands = ['block'];
-
-    if (!validCommands.includes(cmd)) return;
-    
+    if (cmd !== 'block') return;
     if (!isCreator) return m.reply("*📛 THIS IS AN OWNER COMMAND*");
 
-    let users = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '') + '@s.whatsapp.net';
-    
-    await gss.updateBlockStatus(users, 'block')
-      .then((res) => m.reply(`Blocked ${users.split('@')[0]} successfully.`))
-      .catch((err) => m.reply(`Failed to block user: ${err}`));
+    let target;
+
+    // Priority: Mentioned user > Quoted message > Raw number
+    if (m.mentionedJid && m.mentionedJid[0]) {
+      target = m.mentionedJid[0];
+    } else if (m.quoted) {
+      target = m.quoted.sender;
+    } else if (text.match(/^\d{7,}$/)) {
+      target = `${text.replace(/[^0-9]/g, '')}@s.whatsapp.net`;
+    } else {
+      return m.reply("❌ Please mention a user, quote a message, or provide a number.");
+    }
+
+    await gss.updateBlockStatus(target, 'block');
+    await m.reply(`✅ Successfully blocked @${target.split('@')[0]}`, { mentions: [target] });
+
   } catch (error) {
-    console.error('Error:', error);
-    m.reply('An error occurred while processing the command.');
+    console.error('❌ Block Command Error:', error);
+    await m.reply('⚠️ An error occurred while processing the block command.');
   }
 };
 
