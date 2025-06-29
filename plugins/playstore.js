@@ -3,7 +3,7 @@ import { createRequire } from "module";
 
 // Import config.cjs using createRequire
 const require = createRequire(import.meta.url);
-const config = require("../../config.cjs");
+const config = require('../config.cjs');
 
 const whatsappApkSearchCommand = async (m, gss) => {
   const prefix = config.PREFIX;
