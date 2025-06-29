@@ -168,15 +168,10 @@ ${prefix}𝙻𝚢𝚛𝚒𝚌𝚜
             buttons
           }),
           contextInfo: {
-                  mentionedJid: [m.sender], 
-                  forwardingScore: 999,
-                  isForwarded: true,
-                forwardedNewsletterMessageInfo: {
-                  newsletterJid: '120363402220977044@newsletter',
-                  newsletterName: "<| 𝐊𝐈𝐍𝐆-𝐒𝐀𝐍𝐃𝐄𝐒𝐇-𝐌𝐃 𝐕❷🫧",
-                  serverMessageId: 143
-                }
-              }
+  mentionedJid: [m.sender],
+  forwardingScore: 999,
+  isForwarded: true
+          }
         }),
       },
     },
