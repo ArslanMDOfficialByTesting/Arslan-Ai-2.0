@@ -1,5 +1,5 @@
 import axios from 'axios';
-import config from '../../config.cjs';  // Your bot configuration
+const config = require('../config.cjs');  // Your bot configuration
 
 // Helper function to fetch and send an image
 const sendImage = async (m, sock, imageUrl, caption) => {
