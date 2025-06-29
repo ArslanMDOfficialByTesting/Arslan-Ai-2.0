@@ -85,28 +85,41 @@ async function startBot() {
   });
 
   sock.ev.on('messages.upsert', async ({ messages }) => {
-    const msg = messages[0];
-    if (!msg.message) return;
+  const msg = messages[0];
+  if (!msg.message) return;
 
-    const sender = msg.key.remoteJid;
-    const type = Object.keys(msg.message)[0];
-    const text = msg.message?.conversation || msg.message[type]?.text || '';
+  const sender = msg.key.remoteJid;
+  const type = Object.keys(msg.message)[0];
+  const text = msg.message?.conversation || msg.message[type]?.text || '';
 
-    if (text.startsWith(PREFIX)) {
-      const command = text.slice(PREFIX.length).split(' ')[0].toLowerCase();
-      if (plugins[command]) {
-        try {
-          // ⏩ Pass owner ID to plugin handler
-          await plugins[command](sock, msg, sender, text, `${OWNER_NUMBER}@s.whatsapp.net`);
-        } catch (err) {
-          console.error(`❌ Error in ${command}:`, err);
-          await sock.sendMessage(sender, { text: '❌ Command error.' }, { quoted: msg });
+  // ✅ Auto React to messages
+  if (config.AUTO_REACT && !msg.key.fromMe) {
+    try {
+      await sock.sendMessage(msg.key.remoteJid, {
+        react: {
+          text: config.AUTOLIKE_EMOJI || '❤️',
+          key: msg.key
         }
-      } else {
-        await sock.sendMessage(sender, { text: `❌ Unknown command: *${command}*` }, { quoted: msg });
-      }
+      });
+    } catch (e) {
+      console.log('⚠️ Auto React Error:', e);
     }
-  });
+  }
+
+  if (text.startsWith(PREFIX)) {
+    const command = text.slice(PREFIX.length).split(' ')[0].toLowerCase();
+    if (plugins[command]) {
+      try {
+        await plugins[command](sock, msg, sender, text, `${OWNER_NUMBER}@s.whatsapp.net`);
+      } catch (err) {
+        console.error(`❌ Error in ${command}:`, err);
+        await sock.sendMessage(sender, { text: '❌ Command error.' }, { quoted: msg });
+      }
+    } else {
+      await sock.sendMessage(sender, { text: `❌ Unknown command: *${command}*` }, { quoted: msg });
+    }
+  }
+});
 }
 
 startBot();
