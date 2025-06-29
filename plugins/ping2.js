@@ -1,10 +1,9 @@
 const config = require('../config.cjs');
 
-const ping = async (m, Matrix) => {
-  const prefix = config.PREFIX;
-  const cmd = m.body.startsWith(prefix) ? m.body.slice(prefix.length).split(' ')[0].toLowerCase() : '';
+module.exports = {
+  command: 'ping2',
 
-  if (cmd === "ping2") {
+  handler: async (sock, m, sender, text) => {
     const start = Date.now();
 
     const reactionEmojis = ['🔥', '⚡', '🚀', '👻', '🎲', '🔗', '🌟', '💥', '🕐', '🔹'];
@@ -13,7 +12,6 @@ const ping = async (m, Matrix) => {
     const reactionEmoji = reactionEmojis[Math.floor(Math.random() * reactionEmojis.length)];
     let textEmoji = textEmojis[Math.floor(Math.random() * textEmojis.length)];
 
-    // Ensure reaction and text emojis are different
     while (textEmoji === reactionEmoji) {
       textEmoji = textEmojis[Math.floor(Math.random() * textEmojis.length)];
     }
@@ -23,10 +21,10 @@ const ping = async (m, Matrix) => {
     const end = Date.now();
     const responseTime = (end - start);
 
-    const text = `*${config.BOT_NAME} S𝙿𝙴𝙴𝙳: ${responseTime}ms ${reactionEmoji}*`;
+    const replyText = `*${config.BOT_NAME} S𝙿𝙴𝙴𝙳: ${responseTime}ms ${reactionEmoji}*`;
 
-    await Matrix.sendMessage(m.from, {
-      text,
+    await sock.sendMessage(m.from, {
+      text: replyText,
       contextInfo: {
         mentionedJid: [m.sender],
         forwardingScore: 999,
@@ -35,5 +33,3 @@ const ping = async (m, Matrix) => {
     }, { quoted: m });
   }
 };
-
-export default ping;
