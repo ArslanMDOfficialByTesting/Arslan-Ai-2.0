@@ -2,22 +2,16 @@ const fs = require('fs');
 const path = require('path');
 const pino = require('pino');
 const { Boom } = require('@hapi/boom');
-const { fileURLToPath } = require('url');
-const config = require('./config.cjs');
-
+const megajs = require('megajs');
 const {
   default: makeWASocket,
   useMultiFileAuthState,
   makeCacheableSignalKeyStore,
   DisconnectReason,
-  fetchLatestBaileysVersion,
-  delay
+  fetchLatestBaileysVersion
 } = require('@whiskeysockets/baileys');
 
-const __filename = fileURLToPath(import.meta.url || __filename);
-const __dirname = path.dirname(__filename);
-
-const { SESSION_ID, OWNER_NUMBER, BOT_NAME, PREFIX } = config;
+const config = require('./config.cjs');
 
 async function useSession(session_id) {
   const sessionPath = './auth_info';
@@ -26,18 +20,18 @@ async function useSession(session_id) {
 
   if (!fs.existsSync(file)) {
     const megaUrl = `https://mega.nz/file/${session_id.replace('ARSL~', '')}`;
-    const megajs = await import('megajs');
-    const stream = megajs.File.fromURL(megaUrl).download();
+    const fileInstance = megajs.File.fromURL(megaUrl);
+    const stream = fileInstance.download();
     const output = fs.createWriteStream(file);
     stream.pipe(output);
-    await new Promise(res => output.on('finish', res));
+    await new Promise((res) => output.on('finish', res));
   }
 
   return await useMultiFileAuthState(sessionPath);
 }
 
 async function startBot() {
-  const { state, saveCreds } = await useSession(SESSION_ID);
+  const { state, saveCreds } = await useSession(config.SESSION_ID);
   const { version } = await fetchLatestBaileysVersion();
 
   const sock = makeWASocket({
@@ -55,14 +49,15 @@ async function startBot() {
 
   sock.ev.on('connection.update', async ({ connection, lastDisconnect }) => {
     if (connection === 'close') {
-      const shouldReconnect = (lastDisconnect?.error)?.output?.statusCode !== DisconnectReason.loggedOut;
-      console.log("❌ Connection closed:", lastDisconnect?.error?.message);
+      const shouldReconnect =
+        (lastDisconnect?.error?.output?.statusCode || 0) !== DisconnectReason.loggedOut;
+      console.log("❌ Connection closed:", lastDisconnect?.error?.message || '');
       if (shouldReconnect) {
-        await delay(5000);
-        startBot();
+        console.log("🔁 Reconnecting...");
+        await startBot();
       }
     } else if (connection === 'open') {
-      console.log("✅ Bot is connected as:", sock.user.id);
+      console.log('✅ Bot connected as:', sock.user.id);
     }
   });
 
@@ -74,20 +69,21 @@ async function startBot() {
     const type = Object.keys(msg.message)[0];
     const text = msg.message?.conversation || msg.message[type]?.text || '';
 
-    if (text.startsWith(PREFIX)) {
-      const cmd = text.slice(PREFIX.length).trim().toLowerCase();
-
+    if (text.startsWith(config.PREFIX)) {
+      const cmd = text.slice(config.PREFIX.length).trim().toLowerCase();
       switch (cmd) {
         case 'ping':
-          await sock.sendMessage(sender, { text: '*Pong!* 🏓' }, { quoted: msg });
+          await sock.sendMessage(sender, { text: '🏓 Pong!' }, { quoted: msg });
           break;
-
         case 'owner':
-          await sock.sendMessage(sender, { text: `👑 My Owner: wa.me/${OWNER_NUMBER}` }, { quoted: msg });
+          await sock.sendMessage(sender, {
+            text: `👑 My Owner: wa.me/${config.OWNER_NUMBER}`
+          }, { quoted: msg });
           break;
-
         default:
-          await sock.sendMessage(sender, { text: `❌ Unknown command: *${cmd}*` }, { quoted: msg });
+          await sock.sendMessage(sender, {
+            text: `❌ Unknown command: *${cmd}*`
+          }, { quoted: msg });
       }
     }
   });
