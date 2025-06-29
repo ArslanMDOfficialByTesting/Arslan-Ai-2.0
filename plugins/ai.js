@@ -1,7 +1,7 @@
 const fs = require('fs').promises;
 const path = require('path');
 const fetch = require('node-fetch');
-const config = require('../../config.cjs');
+const config = require('../config.cjs');
 
 const chatHistoryFile = path.resolve(__dirname, '../deepseek_history.json');
 const deepSeekSystemPrompt = "You are an intelligent AI assistant.";
