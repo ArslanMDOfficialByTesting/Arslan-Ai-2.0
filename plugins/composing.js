@@ -1,4 +1,4 @@
-import config from '../../config.cjs';
+const config = require('../config.cjs');
 
 async function handleCommand(m, gss) {
 
