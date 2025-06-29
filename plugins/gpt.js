@@ -1,4 +1,4 @@
-import config from '../../config.cjs';
+const config = require('../config.cjs');
 import axios from 'axios';
 
 const gpt = async (m, sock) => {
