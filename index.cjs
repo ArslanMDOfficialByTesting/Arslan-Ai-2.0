@@ -86,7 +86,7 @@ async function startBot() {
 
   sock.ev.on('messages.upsert', async ({ messages }) => {
     const msg = messages[0];
-    if (!msg.message || msg.key.fromMe) return;
+    if (!msg.message) return;
 
     const sender = msg.key.remoteJid;
     const type = Object.keys(msg.message)[0];
