@@ -1,4 +1,4 @@
-import config from '../config.cjs';
+const config = require('../config.cjs');
 
 const ping = async (m, Matrix) => {
   const prefix = config.PREFIX;
