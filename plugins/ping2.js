@@ -16,10 +16,16 @@ module.exports = {
       textEmoji = textEmojis[Math.floor(Math.random() * textEmojis.length)];
     }
 
-    await m.React(textEmoji);
+    // ✅ Proper Baileys emoji reaction
+    await sock.sendMessage(m.from, {
+      react: {
+        text: textEmoji,
+        key: m.key
+      }
+    });
 
     const end = Date.now();
-    const responseTime = (end - start);
+    const responseTime = end - start;
 
     const replyText = `*${config.BOT_NAME} S𝙿𝙴𝙴𝙳: ${responseTime}ms ${reactionEmoji}*`;
 
