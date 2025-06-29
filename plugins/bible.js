@@ -8,37 +8,35 @@ const bible = async (m, sock) => {
 
   if (cmd === "bible") {
     if (!text) {
-      await m.reply(`Please specify a Bible reference (e.g., John 3:16).`);
-      return;
+      return await m.reply(`📖 Please specify a Bible reference.\n*Example:* ${prefix}bible John 3:16`);
     }
 
-    const start = new Date().getTime();
-    await m.React('⏳');
+    const start = Date.now();
+    await m.React('📖');
 
     try {
       const apiUrl = `https://bible-api.com/${encodeURIComponent(text)}`;
-      const response = await fetch(apiUrl);
-      const data = await response.json();
-      const end = new Date().getTime();
-      const responseTime = end - start;
+      const res = await fetch(apiUrl);
+      const data = await res.json();
+      const duration = Date.now() - start;
 
       if (data.error) {
-        await m.reply(`Error fetching verse: ${data.error}`);
-      } else if (data.text) {
-        const verseText = data.text.trim();
-        const reference = data.reference;
-        const formattedText = `─═< ◉ >═─\n\n*${reference}*\n\n${verseText}\n\n─═< ◉ >═─\n_Fetched in ${responseTime} ms_`;
-        sock.sendMessage(m.from, { text: formattedText }, { quoted: m });
-      } else {
-        await m.reply(`Could not find the specified Bible reference.`);
+        return await m.reply(`❌ Error: ${data.error}`);
       }
-    } catch (error) {
-      console.error("Error fetching Bible verse:", error);
-      await m.reply(`An error occurred while fetching the verse.`);
+
+      if (data.text) {
+        const formatted = `*📜 ${data.reference}*\n\n${data.text.trim()}\n\n_⏱️ Response Time: ${duration}ms_`;
+        return await sock.sendMessage(m.from, { text: formatted }, { quoted: m });
+      }
+
+      await m.reply(`⚠️ Could not find the specified Bible reference.`);
+    } catch (err) {
+      console.error("❌ Bible Command Error:", err);
+      await m.reply(`⚠️ An error occurred while fetching the verse.`);
     } finally {
       await m.React('✅');
     }
   }
-}
+};
 
 export default bible;
