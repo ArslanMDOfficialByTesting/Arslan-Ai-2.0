@@ -1,7 +1,7 @@
 import pkg, { prepareWAMessageMedia } from '@whiskeysockets/baileys';
 const { generateWAMessageFromContent, proto } = pkg;
 import getFBInfo from '@xaviabot/fb-downloader';
-import config from '../../config.cjs';
+const config = require('../config.cjs');
 
 const fbSearchResultsMap = new Map();
 let fbSearchIndex = 1;
