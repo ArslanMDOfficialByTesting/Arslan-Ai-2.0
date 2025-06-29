@@ -1,24 +1,36 @@
 const config = require("../config.cjs");
 
 module.exports = {
-  command: 'autoreact',
+  command: 'autostatus',
   handler: async (sock, m, sender, text, ownerId) => {
-    if (!sender.includes(ownerId.split('@')[0])) {
-      await sock.sendMessage(m.key.remoteJid, { text: '❌ Owner-only command.' }, { quoted: m });
-      return;
-    }
+    const chatId = m.key.remoteJid;
 
-    const input = text.split(' ')[1];
-    if (!input || !['on', 'off'].includes(input.toLowerCase())) {
-      return sock.sendMessage(m.key.remoteJid, {
-        text: `📍 *Usage:*\n.autoreact on\n.autoreact off`
+    // ✅ Owner check
+    if (sender !== ownerId) {
+      return await sock.sendMessage(chatId, {
+        text: '❌ Owner-only command.'
       }, { quoted: m });
     }
 
-    config.AUTO_REACT = input.toLowerCase() === 'on';
+    const arg = text.split(' ')[1]?.toLowerCase();
 
-    await sock.sendMessage(m.key.remoteJid, {
-      text: `✅ *Auto React turned ${config.AUTO_REACT ? 'ON' : 'OFF'}*`
+    if (arg === 'on') {
+      config.AUTO_STATUS_SEEN = true;
+      return await sock.sendMessage(chatId, {
+        text: '✅ Auto Status Seen turned *ON*'
+      }, { quoted: m });
+    }
+
+    if (arg === 'off') {
+      config.AUTO_STATUS_SEEN = false;
+      return await sock.sendMessage(chatId, {
+        text: '🛑 Auto Status Seen turned *OFF*'
+      }, { quoted: m });
+    }
+
+    // 🧾 Invalid usage
+    return await sock.sendMessage(chatId, {
+      text: 'ℹ️ *Usage:*\n.autostatus on\n.autostatus off'
     }, { quoted: m });
   }
 };
