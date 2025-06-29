@@ -1,36 +1,38 @@
 const config = require('../config.cjs');
 
-// Main command function
-const anticallCommand = async (m, Matrix) => {
+const autolikeCommand = async (m, Matrix) => {
   const botNumber = await Matrix.decodeJid(Matrix.user.id);
-  const isCreator = [botNumber, config.OWNER_NUMBER + '@s.whatsapp.net'].includes(m.sender);
-  const prefix = config.PREFIX;
-const cmd = m.body.startsWith(prefix) ? m.body.slice(prefix.length).split(' ')[0].toLowerCase() : '';
-const text = m.body.slice(prefix.length + cmd.length).trim();
-  
+  const isCreator = [botNumber, `${config.OWNER_NUMBER}@s.whatsapp.net`].includes(m.sender);
+  const prefix = config.PREFIX || '.';
+
+  const fullCommand = m.body.startsWith(prefix) ? m.body.slice(prefix.length).trim() : '';
+  const cmd = fullCommand.split(' ')[0]?.toLowerCase();
+  const text = fullCommand.slice(cmd.length).trim().toLowerCase();
+
   const validCommands = ['autolike', 'autoslike', 'autostatuslike'];
 
- if (validCommands.includes(cmd)){
-   if (!isCreator) return m.reply("*THIS IS AN OWNER COMMAND*");
-    let responseMessage;
+  if (validCommands.includes(cmd)) {
+    if (!isCreator) return m.reply("🚫 *Owner-only command!*");
+
+    let message;
 
     if (text === 'on') {
       config.AUTOLIKE_STATUS = true;
-      responseMessage = "✅ AUTO LIKE STATUS has been enabled.";
+      message = `👍 *Auto Like Status Enabled.*\nBot will now react to contact statuses.`;
     } else if (text === 'off') {
       config.AUTOLIKE_STATUS = false;
-      responseMessage = "✅ AUTO LIKE STATUS has been disabled.";
+      message = `❌ *Auto Like Status Disabled.*\nBot won't like statuses anymore.`;
     } else {
-      responseMessage = `🌩️ Usage:\n- *${prefix + cmd} ON:* Enable AUTO LIKE STATUS\n- *${prefix + cmd} off:* Disable AUTO LIKE STATUS`;
+      message = `🌩️ *Usage:*\n${prefix + cmd} on\n${prefix + cmd} off`;
     }
 
     try {
-      await Matrix.sendMessage(m.from, { text: responseMessage }, { quoted: m });
-    } catch (error) {
-      console.error("Error processing your request:", error);
-      await Matrix.sendMessage(m.from, { text: 'Error processing your request.' }, { quoted: m });
+      await Matrix.sendMessage(m.from, { text: message }, { quoted: m });
+    } catch (err) {
+      console.error("❌ Error in autolikeCommand:", err);
+      await Matrix.sendMessage(m.from, { text: '⚠️ Failed to process your request.' }, { quoted: m });
     }
   }
 };
 
-export default anticallCommand;
+export default autolikeCommand;
