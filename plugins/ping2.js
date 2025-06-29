@@ -1,41 +1,18 @@
-const config = require('../config.cjs');
-
 module.exports = {
   command: 'ping2',
+  handler: async (sock, m, sender, text, ownerId) => {
+    try {
+      const start = Date.now();
+      await sock.sendPresenceUpdate('composing', m.from);
+      const end = Date.now();
+      const ping = end - start;
 
-  handler: async (sock, m, sender, text) => {
-    const start = Date.now();
-
-    const reactionEmojis = ['🔥', '⚡', '🚀', '👻', '🎲', '🔗', '🌟', '💥', '🕐', '🔹'];
-    const textEmojis = ['💎', '🏆', '⚡️', '🚀', '🎶', '🌠', '⭐', '🔱', '🛡️', '✨'];
-
-    const reactionEmoji = reactionEmojis[Math.floor(Math.random() * reactionEmojis.length)];
-    let textEmoji = textEmojis[Math.floor(Math.random() * textEmojis.length)];
-
-    while (textEmoji === reactionEmoji) {
-      textEmoji = textEmojis[Math.floor(Math.random() * textEmojis.length)];
+      await sock.sendMessage(m.from, {
+        text: `🚀 *Ping:* ${ping}ms\n👑 *Owner:* wa.me/${ownerId.split('@')[0]}`
+      }, { quoted: m });
+    } catch (e) {
+      console.error("Ping2 error:", e);
+      await sock.sendMessage(m.from, { text: "❌ Failed to respond." }, { quoted: m });
     }
-
-    // ✅ Proper Baileys emoji reaction
-    await sock.sendMessage(m.from, {
-      react: {
-        text: textEmoji,
-        key: m.key
-      }
-    });
-
-    const end = Date.now();
-    const responseTime = end - start;
-
-    const replyText = `*${config.BOT_NAME} S𝙿𝙴𝙴𝙳: ${responseTime}ms ${reactionEmoji}*`;
-
-    await sock.sendMessage(m.from, {
-      text: replyText,
-      contextInfo: {
-        mentionedJid: [m.sender],
-        forwardingScore: 999,
-        isForwarded: true
-      }
-    }, { quoted: m });
   }
 };
