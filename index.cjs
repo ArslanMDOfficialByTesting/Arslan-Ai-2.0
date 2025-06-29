@@ -1,8 +1,10 @@
 const fs = require('fs');
 const path = require('path');
-const { Boom } = require('@hapi/boom');
 const pino = require('pino');
+const { Boom } = require('@hapi/boom');
+const { fileURLToPath } = require('url');
 const config = require('./config.cjs');
+
 const {
   default: makeWASocket,
   useMultiFileAuthState,
@@ -12,18 +14,20 @@ const {
   delay
 } = require('@whiskeysockets/baileys');
 
-const { SESSION_ID, OWNER_NUMBER } = config;
+const __filename = fileURLToPath(import.meta.url || __filename);
+const __dirname = path.dirname(__filename);
+
+const { SESSION_ID, OWNER_NUMBER, BOT_NAME, PREFIX } = config;
 
 async function useSession(session_id) {
   const sessionPath = './auth_info';
   if (!fs.existsSync(sessionPath)) fs.mkdirSync(sessionPath);
   const file = `${sessionPath}/creds.json`;
 
-  // If not exists, download from MEGA
   if (!fs.existsSync(file)) {
     const megaUrl = `https://mega.nz/file/${session_id.replace('ARSL~', '')}`;
-    const { File } = require('megajs');
-    const stream = File.fromURL(megaUrl).download();
+    const megajs = await import('megajs');
+    const stream = megajs.File.fromURL(megaUrl).download();
     const output = fs.createWriteStream(file);
     stream.pipe(output);
     await new Promise(res => output.on('finish', res));
@@ -32,7 +36,7 @@ async function useSession(session_id) {
   return await useMultiFileAuthState(sessionPath);
 }
 
-const startBot = async () => {
+async function startBot() {
   const { state, saveCreds } = await useSession(SESSION_ID);
   const { version } = await fetchLatestBaileysVersion();
 
@@ -49,11 +53,14 @@ const startBot = async () => {
 
   sock.ev.on('creds.update', saveCreds);
 
-  sock.ev.on('connection.update', ({ connection, lastDisconnect }) => {
+  sock.ev.on('connection.update', async ({ connection, lastDisconnect }) => {
     if (connection === 'close') {
       const shouldReconnect = (lastDisconnect?.error)?.output?.statusCode !== DisconnectReason.loggedOut;
       console.log("❌ Connection closed:", lastDisconnect?.error?.message);
-      if (shouldReconnect) startBot();
+      if (shouldReconnect) {
+        await delay(5000);
+        startBot();
+      }
     } else if (connection === 'open') {
       console.log("✅ Bot is connected as:", sock.user.id);
     }
@@ -67,8 +74,8 @@ const startBot = async () => {
     const type = Object.keys(msg.message)[0];
     const text = msg.message?.conversation || msg.message[type]?.text || '';
 
-    if (text.startsWith(config.PREFIX)) {
-      const cmd = text.slice(config.PREFIX.length).trim().toLowerCase();
+    if (text.startsWith(PREFIX)) {
+      const cmd = text.slice(PREFIX.length).trim().toLowerCase();
 
       switch (cmd) {
         case 'ping':
@@ -84,6 +91,6 @@ const startBot = async () => {
       }
     }
   });
-};
+}
 
 startBot();
