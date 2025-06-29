@@ -1,4 +1,4 @@
-import config from '../../config.cjs';
+const config = require('../config.cjs');
 
 const menu = async (m, sock) => {
   const prefix = config.PREFIX;
