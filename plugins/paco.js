@@ -1,4 +1,4 @@
-import _0x284800 from '../../config.cjs';
+const config = require('../config.cjs');
 const ping = async (_0x212d45, _0x4dcc41) => {
   const _0x3b18a9 = _0x284800.PREFIX;
   const _0x15c85c = _0x212d45.body.startsWith(_0x3b18a9) ? _0x212d45.body.slice(_0x3b18a9.length).split(" ")[0x0].toLowerCase() : '';
