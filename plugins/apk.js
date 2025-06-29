@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-const config = require('../config.cjs');
+import config from '../config.cjs';
 
 const apkSearch = async (m, Matrix) => {
   const prefix = config.PREFIX;
