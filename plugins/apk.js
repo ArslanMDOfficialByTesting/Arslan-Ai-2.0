@@ -1,25 +1,27 @@
-import fetch from 'node-fetch';
-import config from '../config.cjs';
+const fetch = require('node-fetch');
+const config = require('../config.cjs');
 
-const apkSearch = async (m, Matrix) => {
-  const prefix = config.PREFIX;
-  const cmd = m.body.startsWith(prefix) ? m.body.slice(prefix.length).split(' ')[0].toLowerCase() : '';
-  const text = m.body.slice(prefix.length + cmd.length).trim();
+module.exports = {
+  command: 'apk',
+  handler: async (sock, m, sender, text) => {
+    const prefix = config.PREFIX || '.';
+    const appQuery = text?.split(' ').slice(1).join(' ');
 
-  if (cmd === "apk" || cmd === "apksearch") {
-    if (!text) {
-      return m.reply("🔍 Please provide an app name to search. Example:\n\n.apk Instagram");
+    if (!appQuery) {
+      return sock.sendMessage(m.from, {
+        text: `📦 *APK Search Help*\n\nUse like this:\n${prefix}apk Instagram`
+      }, { quoted: m });
     }
 
-    await m.React("🔎");
+    await sock.sendMessage(m.from, { text: "🔍 Searching APK..." }, { quoted: m });
 
     try {
-      const searchUrl = `https://api.apkpure.net/v1/search?q=${encodeURIComponent(text)}&limit=1`;
+      const searchUrl = `https://api.apkpure.net/v1/search?q=${encodeURIComponent(appQuery)}&limit=1`;
       const searchResponse = await fetch(searchUrl);
       const searchData = await searchResponse.json();
 
       if (!searchData || !searchData.data || searchData.data.length === 0) {
-        return m.reply("❌ No results found for your query.");
+        return sock.sendMessage(m.from, { text: "❌ No results found for that app." }, { quoted: m });
       }
 
       const app = searchData.data[0];
@@ -28,25 +30,21 @@ const apkSearch = async (m, Matrix) => {
       const appData = await detailResponse.json();
 
       if (!appData || !appData.data) {
-        return m.reply("⚠️ Could not fetch app details.");
+        return sock.sendMessage(m.from, { text: "⚠️ Failed to fetch app details." }, { quoted: m });
       }
 
       const info = appData.data;
-      const message = `*📦 App Name:* ${info.name}\n*🧾 Description:* ${info.description?.slice(0, 200)}...\n*📁 Size:* ${info.size}\n*🆔 Package:* ${info.package_name}\n*📥 Download:* ${info.download_link || "Unavailable"}`;
 
-      await Matrix.sendMessage(m.from, {
+      const caption = `*📱 App Name:* ${info.name}\n*🧾 Description:* ${info.description?.slice(0, 200) || 'N/A'}...\n*📁 Size:* ${info.size}\n*📦 Package:* ${info.package_name}\n*📥 Download:* ${info.download_link || "Unavailable"}`;
+
+      await sock.sendMessage(m.from, {
         image: { url: info.icon },
-        caption: message
+        caption
       }, { quoted: m });
 
-      await m.React("✅");
-
     } catch (err) {
-      console.error("APK Search Error:", err);
-      await m.reply("❌ An error occurred while fetching app info.");
-      await m.React("❌");
+      console.error("APK Plugin Error:", err);
+      await sock.sendMessage(m.from, { text: "❌ An error occurred while searching." }, { quoted: m });
     }
   }
 };
-
-export default apkSearch;
