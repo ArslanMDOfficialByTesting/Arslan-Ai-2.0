@@ -1,26 +1,40 @@
 const config = require('../config.cjs');
 
-async function handleCommand(m, gss) {
+const handleCommand = async (m, gss) => {
+  try {
+    const from = m.from;
+    const sender = m.sender || '';
 
-    if (config.AUTO_TYPING && m.from) {
-        gss.sendPresenceUpdate("composing", m.from);
+    // ✍️ Auto Typing
+    if (config.AUTO_TYPING && from) {
+      gss.sendPresenceUpdate('composing', from);
     }
 
-    if (config.AUTO_RECORDING && m.from) {
-        gss.sendPresenceUpdate("recording", m.from);
+    // 🎙️ Auto Recording
+    if (config.AUTO_RECORDING && from) {
+      gss.sendPresenceUpdate('recording', from);
     }
 
-    if (m.from) {
-        gss.sendPresenceUpdate(config.ALWAYS_ONLINE ? 'available' : 'unavailable', m.from);
+    // 🟢 Always Online OR Unavailable
+    if (from) {
+      const presence = config.ALWAYS_ONLINE ? 'available' : 'unavailable';
+      gss.sendPresenceUpdate(presence, from);
     }
 
-    if (config.AUTO_READ) {
-        await gss.readMessages([m.key]);
+    // 📖 Auto Read
+    if (config.AUTO_READ && m.key) {
+      await gss.readMessages([m.key]);
     }
 
-    if (config.AUTO_BLOCK && m.sender.startsWith('212')) {
-        await gss.updateBlockStatus(m.sender, 'block');
+    // 🚫 Auto Block Morocco (+212)
+    if (config.AUTO_BLOCK && sender.startsWith('212')) {
+      await gss.updateBlockStatus(sender, 'block');
+      console.log(`🚫 Auto-blocked: ${sender}`);
     }
-}
+
+  } catch (err) {
+    console.error("❌ Error in handleCommand:", err);
+  }
+};
 
 export default handleCommand;
