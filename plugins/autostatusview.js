@@ -1,46 +1,37 @@
 const config = require('../config.cjs');
 
-// Main command function
-const anticallCommand = async (m, Matrix) => {
+const autostatusCommand = async (m, Matrix) => {
   const botNumber = await Matrix.decodeJid(Matrix.user.id);
-  const isCreator = [botNumber, config.OWNER_NUMBER + '@s.whatsapp.net'].includes(m.sender);
+  const isCreator = [botNumber, `${config.OWNER_NUMBER}@s.whatsapp.net`].includes(m.sender);
   const prefix = config.PREFIX;
+
   const [cmd, ...args] = m.body.startsWith(prefix) ? m.body.slice(prefix.length).split(/\s+/) : [''];
   const text = args.join(' ').trim().toLowerCase();
 
   const validCommands = ['autostatus', 'autosview', 'autostatusview'];
 
   if (validCommands.includes(cmd)) {
-    if (!isCreator) return m.reply("*📛 THIS IS AN OWNER COMMAND*");
-    let responseMessage = '';
-    let updatedConfig = false;
+    if (!isCreator) return m.reply("🚫 *This command is only for the bot owner.*");
 
+    let message;
     if (text === 'on') {
       config.AUTO_STATUS_SEEN = true;
-      updatedConfig = true;
-      responseMessage = "✅ AUTO STATUS SEEN has been enabled.";
+      message = "👁️ *Auto Status Seen has been enabled.*\nBot will now automatically view contact statuses.";
     } else if (text === 'off') {
       config.AUTO_STATUS_SEEN = false;
-      updatedConfig = true;
-      responseMessage = "❌ AUTO STATUS SEEN has been disabled.";
+      message = "❌ *Auto Status Seen has been disabled.*";
     } else {
-      responseMessage = `🌩️ Usage:\n- *${prefix + cmd} on:* Enable AUTO STATUS SEEN\n- *${prefix + cmd} off:* Disable AUTO STATUS SEEN`;
+      message = `🌩️ *Usage:*\n${prefix + cmd} on\n${prefix + cmd} off`;
     }
 
     try {
-      await Matrix.sendMessage(m.from, { text: responseMessage }, { quoted: m });
-      if (updatedConfig) {
-        // Optionally, you might want to save the updated config to a file here
-        // depending on how your config is managed. For example:
-        // import fs from 'node:fs/promises';
-        // await fs.writeFile('../../config.cjs', `export default ${JSON.stringify(config, null, 2)};`);
-        console.log("⚙️ Config updated:", config); // Log with emoji
-      }
-    } catch (error) {
-      console.error("⚠️ Error processing your request:", error); // Error with warning emoji
-      await Matrix.sendMessage(m.from, { text: '⚠️ Error processing your request.' }, { quoted: m });
+      await Matrix.sendMessage(m.from, { text: message }, { quoted: m });
+      console.log("✅ AUTO_STATUS_SEEN:", config.AUTO_STATUS_SEEN);
+    } catch (err) {
+      console.error("⚠️ Error in autostatusCommand:", err);
+      await Matrix.sendMessage(m.from, { text: '⚠️ Failed to process your request.' }, { quoted: m });
     }
   }
 };
 
-export default anticallCommand;
+export default autostatusCommand;
