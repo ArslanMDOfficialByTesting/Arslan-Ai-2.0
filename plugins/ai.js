@@ -1,12 +1,9 @@
-import { promises as fs } from 'fs';
-import path from 'path';
-import fetch from 'node-fetch';
-import config from '../../config.cjs';
+const fs = require('fs').promises;
+const path = require('path');
+const fetch = require('node-fetch');
+const config = require('../../config.cjs');
 
-const __filename = new URL(import.meta.url).pathname;
-const __dirname = path.dirname(__filename);
 const chatHistoryFile = path.resolve(__dirname, '../deepseek_history.json');
-
 const deepSeekSystemPrompt = "You are an intelligent AI assistant.";
 
 async function readChatHistoryFromFile() {
@@ -91,7 +88,6 @@ const deepseek = async (m, Matrix) => {
 
             if (codeMatch) {
                 const code = codeMatch[1];
-
                 await Matrix.sendMessage(m.from, { text: `🔹 *Here's your code snippet:* \n\n\`\`\`${code}\`\`\`` }, { quoted: m });
             } else {
                 await Matrix.sendMessage(m.from, { text: answer }, { quoted: m });
@@ -106,4 +102,4 @@ const deepseek = async (m, Matrix) => {
     }
 };
 
-export default deepseek;
+module.exports = deepseek;
