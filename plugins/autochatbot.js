@@ -2,51 +2,41 @@ const config = require('../config.cjs');
 
 const autotypingCommand = async (m, Matrix) => {
   const botNumber = await Matrix.decodeJid(Matrix.user.id);
-  const isCreator = [botNumber, config.OWNER_NUMBER + '@s.whatsapp.net'].includes(m.sender);
-  const prefix = config.PREFIX;
-  const cmd = m.body.startsWith(prefix) ? m.body.slice(prefix.length).split(' ')[0].toLowerCase() : '';
-  const text = m.body.slice(prefix.length + cmd.length).trim();
+  const isCreator = [botNumber, `${config.OWNER_NUMBER}@s.whatsapp.net`].includes(m.sender);
+  const prefix = config.PREFIX || '.';
 
-  // List of all commands that should toggle the chatbot state
+  const fullCommand = m.body.startsWith(prefix) ? m.body.slice(prefix.length).trim() : '';
+  const cmd = fullCommand.split(' ')[0]?.toLowerCase();
+  const text = fullCommand.slice(cmd.length).trim().toLowerCase();
+
+  // Allowed aliases
   const validCommands = ['chatbot', 'lydea', 'lydia', 'answer', 'automreply'];
 
-  // Check if the command is in the list of valid commands
   if (validCommands.includes(cmd)) {
-    if (!isCreator) return m.reply("*👺ᴛʜɪꜱ ɪꜱ ᴏᴡɴᴇʀ ᴄᴏᴍᴍᴀɴᴅ*");
+    if (!isCreator) {
+      return m.reply("👺 *Only the bot owner can use this command.*");
+    }
 
-    let responseMessage;
+    let message = '';
+    const status = text === 'on' ? true : text === 'off' ? false : null;
 
-    // Toggle chatbot state based on the passed argument ('on' or 'off')
-    if (text === 'on') {
+    if (status === true) {
       config.CHAT_BOT = true;
-      responseMessage = `${cmd.charAt(0).toUpperCase() + cmd.slice(1)}: Chatbot has been enabled.`;
-    } else if (text === 'off') {
+      message = `✅ *${cmd.toUpperCase()} is now Enabled.*\nBot will auto-reply to messages.`;
+    } else if (status === false) {
       config.CHAT_BOT = false;
-      responseMessage = `${cmd.charAt(0).toUpperCase() + cmd.slice(1)}: Chatbot has been disabled.`;
+      message = `🛑 *${cmd.toUpperCase()} is now Disabled.*\nBot won't auto-reply anymore.`;
     } else {
-      responseMessage = "🌩️ Usage:\n- `command on`: Enable Chatbot\n- `command off`: Disable Chatbot";
+      message = `🌩️ *Usage:*\n${prefix}${cmd} on\n${prefix}${cmd} off`;
     }
 
     try {
-      await Matrix.sendMessage(m.from, { text: responseMessage }, { quoted: m });
+      await Matrix.sendMessage(m.from, { text: message }, { quoted: m });
     } catch (error) {
-      console.error("Error processing your request:", error);
-      await Matrix.sendMessage(m.from, { text: 'Error processing your request.' }, { quoted: m });
+      console.error(`[❌ ERROR]:`, error);
+      await Matrix.sendMessage(m.from, { text: '⚠️ Error while processing your request.' }, { quoted: m });
     }
   }
 };
 
 export default autotypingCommand;
-
-
-/*
-
-1. chatbot on
-2. chatbot off
-3. lydea
-4. lydia
-5. bot
-6. automreply on
-7. automreply off
-
-                               */
