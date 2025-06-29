@@ -1,10 +1,12 @@
 import moment from "moment-timezone";
-import config require "../config.cjs";
+import config from "../config.cjs"; // ✅ Fixed import line
 
 const alive = async (m, Matrix) => {
   const prefix = config.PREFIX;
   const pushName = m.pushName || 'User';
-  const cmd = m.body.startsWith(prefix) ? m.body.slice(prefix.length).split(" ")[0].toLowerCase() : "";
+  const cmd = m.body.startsWith(prefix)
+    ? m.body.slice(prefix.length).split(" ")[0].toLowerCase()
+    : "";
 
   if (cmd === "settings") {
     await m.React('⚙️');
