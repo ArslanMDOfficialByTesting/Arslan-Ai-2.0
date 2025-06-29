@@ -1,6 +1,6 @@
 import fs from 'fs';
 import acrcloud from 'acrcloud';
-import config from '../../config.cjs';
+const config = require('../config.cjs');
 
 
 const acr = new acrcloud({
