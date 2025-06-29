@@ -1,4 +1,4 @@
-import config from '../../config.cjs';
+const config = require('../config.cjs');
 
 const ownerContact = async (m, gss) => {
     const ownernumber = config.OWNER_NUMBER;
