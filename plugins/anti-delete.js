@@ -1,6 +1,6 @@
-import fs from 'fs';
+const fs = require('fs');
 const config = require('../config.cjs');
-import pkg from '@whiskeysockets/baileys';
+const pkg = require('@whiskeysockets/baileys');
 const { proto, downloadContentFromMessage } = pkg;
 
 const prefix = config.PREFIX;
@@ -20,7 +20,7 @@ class DemonAntiDelete {
   constructor() {
     this.enabled = false;
     this.messageCache = new Map();
-    this.cacheExpiry = 5 * 60 * 1000; // 5 minutes
+    this.cacheExpiry = 5 * 60 * 1000;
     this.cleanupInterval = setInterval(() => this.cleanExpiredMessages(), this.cacheExpiry);
   }
 
@@ -84,21 +84,11 @@ const AntiDelete = async (m, Matrix) => {
   if (m.body.toLowerCase() === `${prefix}antidelete on` || m.body.toLowerCase() === `${prefix}antidelete off`) {
     const responses = {
       on: {
-        text: `*✅ King-Sandesh-Md Anti-Delete Activated..!*\n\n` +
-              `• Status: ✅ Enabled\n` +
-              `• Cache: 🕒 5 minutes\n` +
-              `• Mode: 🌐 Global\n\n` +
-              `_Deleted messages will now rise from the shadows_\n\n` +
-              `━━━━━━⊱✿⊰━━━━━━\n` +
-              `> *© Powered By King-Sandesh Md V2 💸*`,
+        text: `*✅ King-Sandesh-Md Anti-Delete Activated..!*\n\n• Status: ✅ Enabled\n• Cache: 🕒 5 minutes\n• Mode: 🌐 Global\n\n_Deleted messages will now rise from the shadows_\n\n━━━━━━⊱✿⊰━━━━━━\n> *© Powered By King-Sandesh Md V2 💸*`,
         contextInfo: demonContext
       },
       off: {
-        text: `⛔ *King-Sandesh-Md Anti-Delete Deactivated..!*\n\n` +
-              `• Status: ❌ Disabled\n\n` +
-              `_Message recovery disabled_\n\n` +
-              `━━━━━━⊱✿⊰━━━━━━\n` +
-              `> *© Powered By King-Sandesh Md V2 💸*`,
+        text: `⛔ *King-Sandesh-Md Anti-Delete Deactivated..!*\n\n• Status: ❌ Disabled\n\n_Message recovery disabled_\n\n━━━━━━⊱✿⊰━━━━━━\n> *© Powered By King-Sandesh Md V2 💸*`,
         contextInfo: demonContext
       }
     };
@@ -230,4 +220,4 @@ const AntiDelete = async (m, Matrix) => {
   });
 };
 
-export default AntiDelete;
+module.exports = AntiDelete;
