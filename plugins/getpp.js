@@ -1,4 +1,4 @@
-import config from '../../config.cjs';
+const config = require('../config.cjs');
 
 const profile = async (m, sock) => {
   const prefix = config.PREFIX;
