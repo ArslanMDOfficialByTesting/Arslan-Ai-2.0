@@ -1,3 +1,4 @@
+const config = require('../config.cjs');
 import pkg, { prepareWAMessageMedia } from '@whiskeysockets/baileys';
 const { generateWAMessageFromContent, proto } = pkg;
 
