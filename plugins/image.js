@@ -1,5 +1,5 @@
 import axios from 'axios';
-import config from '../../config.cjs';
+const config = require('../config.cjs');
 global.nex_key = 'https://api.nexoracle.com';
 global.nex_api = 'free_key@maher_apis';
 
