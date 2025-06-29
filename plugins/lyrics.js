@@ -1,38 +1,7 @@
-/*                                   
-───────────────────────────────────────────────────────────────────
-
-    ------------උකනව දාල කැරිම තේ එක 👺කමාන්ඩ් කොපි කරොත් කඩන් කනවා තොපේ...කනව කැවුත්ත මුන්ගෙ මමනම්...ක්‍රෙඩිට් එක තියලා වැඩක් කරනවනම් කරපන්------------
-    
-───────────────────────────────────────────────────────────────────    
-Made by Mr Sandesh Bhashana
-contact owner +94741259325
-
-CURRENTLY RUNNING ON BETA VERSION!!
-*
-   * @project_name : KING-SANDESH-MD-V1
-   * @author : <| 𝐌𝐑 𝐔𝐍𝐊𝐍𝐎𝐖𝐍 🫧
-   * @youtube : https://www.youtube.com/@Black-Tappy
-   * @description : Ksmd v2 ,A Multi-functional third party whatsapp user bot.
-   * @version 2
-*
-   * Licensed under the  GPL-3.0 License;
-* 
-   * ┌┤Created By Mr Unknown tech info.
-   * © 2025 King-sandesh-md | sandesh bhashana | mr unknown ✭.
-   * plugin date : 27/6/2025.
-* 
-   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-   * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-   * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-   * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-   * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-   * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-   * SOFTWARE.
-*/
 import axios from 'axios';
 import pkg from '@whiskeysockets/baileys';
 const { generateWAMessageFromContent, proto } = pkg;
-import config from '../../config.cjs';
+const config = require('../config.cjs');
 
 const Lyrics = async (m, Matrix) => {
   const prefix = config.PREFIX;
