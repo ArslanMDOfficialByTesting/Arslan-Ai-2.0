@@ -1,6 +1,6 @@
 import { downloadMediaMessage } from '@whiskeysockets/baileys';
 import Jimp from 'jimp';
-import config from '../config.cjs';
+const config = require('../config.cjs');
 
 const setProfilePicture = async (m, sock) => {
   const botNumber = await sock.decodeJid(sock.user.id);
