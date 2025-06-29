@@ -1,6 +1,6 @@
 import axios from "axios";
 import yts from "yt-search";
-import config from '../config.cjs';
+const config = require('../config.cjs');
 
 const song = async (m, gss) => {
   const prefix = config.PREFIX;
