@@ -1,28 +1,29 @@
-import { default as makeWASocket, useMultiFileAuthState, makeCacheableSignalKeyStore, DisconnectReason, fetchLatestBaileysVersion, delay } from '@whiskeysockets/baileys';
-import pino from 'pino';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { Boom } from '@hapi/boom';
-import config from './config.cjs';
+const fs = require('fs');
+const path = require('path');
+const { Boom } = require('@hapi/boom');
+const pino = require('pino');
+const config = require('./config.cjs');
+const {
+  default: makeWASocket,
+  useMultiFileAuthState,
+  makeCacheableSignalKeyStore,
+  DisconnectReason,
+  fetchLatestBaileysVersion,
+  delay
+} = require('@whiskeysockets/baileys');
 
-// 👇 These two must be added below imports
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const { SESSION_ID, OWNER_NUMBER } = config;
 
-const { SESSION_ID, OWNER_NUMBER, BOT_NAME } = config;
-
-// Prepare auth session from MEGA/URL
 async function useSession(session_id) {
   const sessionPath = './auth_info';
   if (!fs.existsSync(sessionPath)) fs.mkdirSync(sessionPath);
   const file = `${sessionPath}/creds.json`;
 
-  // If not exists, download from MEGA link
+  // If not exists, download from MEGA
   if (!fs.existsSync(file)) {
     const megaUrl = `https://mega.nz/file/${session_id.replace('ARSL~', '')}`;
-    const megajs = await import('megajs');
-    const stream = megajs.File.fromURL(megaUrl).download();
+    const { File } = require('megajs');
+    const stream = File.fromURL(megaUrl).download();
     const output = fs.createWriteStream(file);
     stream.pipe(output);
     await new Promise(res => output.on('finish', res));
@@ -51,14 +52,13 @@ const startBot = async () => {
   sock.ev.on('connection.update', ({ connection, lastDisconnect }) => {
     if (connection === 'close') {
       const shouldReconnect = (lastDisconnect?.error)?.output?.statusCode !== DisconnectReason.loggedOut;
-      console.log("Connection closed due to", lastDisconnect?.error);
+      console.log("❌ Connection closed:", lastDisconnect?.error?.message);
       if (shouldReconnect) startBot();
     } else if (connection === 'open') {
       console.log("✅ Bot is connected as:", sock.user.id);
     }
   });
 
-  // Auto-reply handler
   sock.ev.on('messages.upsert', async ({ messages }) => {
     const msg = messages[0];
     if (!msg.message || msg.key.fromMe) return;
