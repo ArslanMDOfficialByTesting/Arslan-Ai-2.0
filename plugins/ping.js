@@ -5,7 +5,7 @@ const ping = async (m, Matrix) => {
   const cmd = m.body.startsWith(prefix) ? m.body.slice(prefix.length).split(' ')[0].toLowerCase() : '';
 
   if (cmd === "ping2") {
-    const start = new Date().getTime();
+    const start = Date.now();
 
     const reactionEmojis = ['🔥', '⚡', '🚀', '👻', '🎲', '🔗', '🌟', '💥', '🕐', '🔹'];
     const textEmojis = ['💎', '🏆', '⚡️', '🚀', '🎶', '🌠', '⭐', '🔱', '🛡️', '✨'];
@@ -20,22 +20,17 @@ const ping = async (m, Matrix) => {
 
     await m.React(textEmoji);
 
-    const end = new Date().getTime();
-    const responseTime = (end - start) / 1000;
+    const end = Date.now();
+    const responseTime = (end - start);
 
-    const text = `*K𝙸𝙽𝙶 S𝙰𝙽𝙳𝙴𝚂𝙷 M𝙳 S𝙿𝙴𝙴𝙳: ${responseTime.toFixed(2)}ms ${reactionEmoji}*`;
+    const text = `*${config.BOT_NAME} S𝙿𝙴𝙴𝙳: ${responseTime}ms ${reactionEmoji}*`;
 
     await Matrix.sendMessage(m.from, {
       text,
       contextInfo: {
         mentionedJid: [m.sender],
         forwardingScore: 999,
-        isForwarded: true,
-        forwardedNewsletterMessageInfo: {
-          newsletterJid: '120363402220977044@newsletter',
-          newsletterName: "<| 𝐊𝐈𝐍𝐆-𝐒𝐀𝐍𝐃𝐄𝐒𝐇-𝐌𝐃 𝐕❷🫧",
-          serverMessageId: 143
-        }
+        isForwarded: true
       }
     }, { quoted: m });
   }
