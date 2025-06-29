@@ -1,4 +1,4 @@
-import config from '../../config.cjs';
+const config = require('../config.cjs');
 
 const gcEvent = async (m, Matrix) => {
   const prefix = config.PREFIX;
