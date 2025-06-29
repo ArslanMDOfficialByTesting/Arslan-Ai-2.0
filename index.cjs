@@ -12,7 +12,22 @@ const {
 } = require('@whiskeysockets/baileys');
 
 const config = require('./config.cjs');
+const { SESSION_ID, OWNER_NUMBER, PREFIX } = config;
 
+const pluginDir = path.join(__dirname, 'plugins');
+const plugins = {};
+
+// 📁 Load plugins dynamically
+fs.readdirSync(pluginDir).forEach((file) => {
+  if (file.endsWith('.js')) {
+    const plugin = require(path.join(pluginDir, file));
+    if (plugin?.command && typeof plugin.handler === 'function') {
+      plugins[plugin.command] = plugin.handler;
+    }
+  }
+});
+
+// 📦 Load saved session or download from MEGA
 async function useSession(session_id) {
   const sessionPath = './auth_info';
   if (!fs.existsSync(sessionPath)) fs.mkdirSync(sessionPath);
@@ -30,8 +45,9 @@ async function useSession(session_id) {
   return await useMultiFileAuthState(sessionPath);
 }
 
+// 🚀 Start Bot
 async function startBot() {
-  const { state, saveCreds } = await useSession(config.SESSION_ID);
+  const { state, saveCreds } = await useSession(SESSION_ID);
   const { version } = await fetchLatestBaileysVersion();
 
   const sock = makeWASocket({
@@ -58,45 +74,34 @@ async function startBot() {
       }
     } else if (connection === 'open') {
       console.log('✅ Bot connected as:', sock.user.id);
+      await sock.sendMessage(`${OWNER_NUMBER}@s.whatsapp.net`, {
+        text: `✅ *Arslan-Ai 2.0 is now connected!*\n\n👑 Owner: wa.me/${OWNER_NUMBER}`
+      });
     }
   });
 
   sock.ev.on('messages.upsert', async ({ messages }) => {
-  const msg = messages[0];
-  console.log("📥 New Message Received:", JSON.stringify(msg, null, 2));
+    const msg = messages[0];
+    if (!msg.message || msg.key.fromMe) return;
 
-  if (!msg.message || msg.key.fromMe) {
-    console.log("⛔ Message has no content or from me. Skipping.");
-    return;
-  }
+    const sender = msg.key.remoteJid;
+    const type = Object.keys(msg.message)[0];
+    const text = msg.message?.conversation || msg.message[type]?.text || '';
 
-  const sender = msg.key.remoteJid;
-  const type = Object.keys(msg.message)[0];
-  const text = msg.message?.conversation || msg.message[type]?.text || '';
-
-  console.log("📤 Text:", text);
-
-  if (text.startsWith(config.PREFIX)) {
-    const cmd = text.slice(config.PREFIX.length).trim().toLowerCase();
-    console.log("🔍 Command received:", cmd);
-
-    switch (cmd) {
-      case 'ping':
-        await sock.sendMessage(sender, { text: '*Pong!* 🏓' }, { quoted: msg });
-        break;
-
-      case 'owner':
-        await sock.sendMessage(sender, { text: `👑 My Owner: wa.me/${config.OWNER_NUMBER}` }, { quoted: msg });
-        break;
-
-      default:
+    if (text.startsWith(PREFIX)) {
+      const cmd = text.slice(PREFIX.length).trim().toLowerCase();
+      if (plugins[cmd]) {
+        try {
+          await plugins[cmd](sock, msg, sender, text);
+        } catch (err) {
+          console.error(`❌ Error in ${cmd}:`, err);
+          await sock.sendMessage(sender, { text: '❌ Command error.' }, { quoted: msg });
+        }
+      } else {
         await sock.sendMessage(sender, { text: `❌ Unknown command: *${cmd}*` }, { quoted: msg });
+      }
     }
-} else {
-    console.log("❌ Message does not start with prefix:", config.PREFIX);
-  }
   });
-
 }
 
 startBot();
