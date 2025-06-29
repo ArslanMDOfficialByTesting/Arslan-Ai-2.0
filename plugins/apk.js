@@ -1,51 +1,52 @@
 import fetch from 'node-fetch';
-import config from '../config.cjs';
-import { getBuffer } from '../lib/myfunc.js';
+const config = require('../config.cjs');
 
-const downloadapk = async (m, Matrix, args, command) => {
-  const prefix = config.PREFIX || '.';
+const apkSearch = async (m, Matrix) => {
+  const prefix = config.PREFIX;
+  const cmd = m.body.startsWith(prefix) ? m.body.slice(prefix.length).split(' ')[0].toLowerCase() : '';
+  const text = m.body.slice(prefix.length + cmd.length).trim();
 
-  if (!args || !args.length) {
-    return m.reply(`❌ *Usage:* ${prefix + command} <app name>\n📥 Example: ${prefix + command} Instagram`);
-  }
-
-  try {
-    const query = args.join(' ');
-    const api = `https://vihangayt.me/tools/searchapk?q=${encodeURIComponent(query)}`;
-
-    const response = await fetch(api);
-    const json = await response.json();
-
-    if (!json.status || !json.result || json.result.length === 0) {
-      return m.reply('❌ APK not found. Try a different name.');
+  if (cmd === "apk" || cmd === "apksearch") {
+    if (!text) {
+      return m.reply("🔍 Please provide an app name to search. Example:\n\n.apk Instagram");
     }
 
-    const app = json.result[0];
-    const downloadApi = `https://vihangayt.me/tools/downloadapk?pkg=${app.package}`;
+    await m.React("🔎");
 
-    const downRes = await fetch(downloadApi);
-    const downJson = await downRes.json();
+    try {
+      const searchUrl = `https://api.apkpure.net/v1/search?q=${encodeURIComponent(text)}&limit=1`;
+      const searchResponse = await fetch(searchUrl);
+      const searchData = await searchResponse.json();
 
-    if (!downJson.status || !downJson.result?.url) {
-      return m.reply('❌ Failed to fetch download URL.');
+      if (!searchData || !searchData.data || searchData.data.length === 0) {
+        return m.reply("❌ No results found for your query.");
+      }
+
+      const app = searchData.data[0];
+      const detailUrl = `https://api.apkpure.net/v1/apps/${app.package_name}`;
+      const detailResponse = await fetch(detailUrl);
+      const appData = await detailResponse.json();
+
+      if (!appData || !appData.data) {
+        return m.reply("⚠️ Could not fetch app details.");
+      }
+
+      const info = appData.data;
+      const message = `*📦 App Name:* ${info.name}\n*🧾 Description:* ${info.description?.slice(0, 200)}...\n*📁 Size:* ${info.size}\n*🆔 Package:* ${info.package_name}\n*📥 Download:* ${info.download_link || "Unavailable"}`;
+
+      await Matrix.sendMessage(m.from, {
+        image: { url: info.icon },
+        caption: message
+      }, { quoted: m });
+
+      await m.React("✅");
+
+    } catch (err) {
+      console.error("APK Search Error:", err);
+      await m.reply("❌ An error occurred while fetching app info.");
+      await m.React("❌");
     }
-
-    const thumb = await getBuffer(app.icon);
-
-    const caption = `📱 *App Name:* ${app.name}
-📦 *Package:* ${app.package}
-⭐ *Rating:* ${app.rating}
-🔗 *URL:* ${downJson.result.url}`;
-
-    await Matrix.sendMessage(m.from, {
-      image: thumb,
-      caption,
-    }, { quoted: m });
-
-  } catch (e) {
-    console.error(e);
-    return m.reply('❌ An error occurred while fetching the APK.');
   }
 };
 
-export default downloadapk;
+export default apkSearch;
