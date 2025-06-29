@@ -92,8 +92,11 @@ async function startBot() {
       default:
         await sock.sendMessage(sender, { text: `❌ Unknown command: *${cmd}*` }, { quoted: msg });
     }
-  } else {
+} else {
     console.log("❌ Message does not start with prefix:", config.PREFIX);
   }
-});
+  });
+
+}
+
 startBot();
