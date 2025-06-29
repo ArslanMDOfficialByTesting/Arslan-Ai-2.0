@@ -1,19 +1,24 @@
-const config = require('../config.cjs');
+const config = require("../config.cjs");
 
 module.exports = {
   command: 'autoreact',
   handler: async (sock, m, sender, text, ownerId) => {
-    if (sender !== ownerId) return sock.sendMessage(sender, { text: "❌ Owner only command." }, { quoted: m });
-
-    const arg = text.split(' ')[1]?.toLowerCase();
-    if (arg === 'on') {
-      config.AUTO_REACT = true;
-      return sock.sendMessage(sender, { text: '✅ Auto-react enabled.' }, { quoted: m });
-    } else if (arg === 'off') {
-      config.AUTO_REACT = false;
-      return sock.sendMessage(sender, { text: '🛑 Auto-react disabled.' }, { quoted: m });
-    } else {
-      return sock.sendMessage(sender, { text: 'ℹ️ Use `.autoreact on` or `.autoreact off`' }, { quoted: m });
+    const senderId = m.key.participant || m.key.remoteJid || m.participant || m.sender || '';
+    if (!senderId.includes(ownerId.split('@')[0])) {
+      await sock.sendMessage(m.key.remoteJid, { text: '❌ Owner-only command.' }, { quoted: m });
+      return;
     }
+
+    const input = text.split(' ')[1];
+    if (!input || !['on', 'off'].includes(input.toLowerCase())) {
+      return sock.sendMessage(m.key.remoteJid, {
+        text: `📍 Usage:\n.autoreact on\n.autoreact off`
+      }, { quoted: m });
+    }
+
+    config.AUTO_REACT = input.toLowerCase() === 'on';
+    await sock.sendMessage(m.key.remoteJid, {
+      text: `✅ Auto React turned *${config.AUTO_REACT ? 'ON' : 'OFF'}*`
+    }, { quoted: m });
   }
 };
