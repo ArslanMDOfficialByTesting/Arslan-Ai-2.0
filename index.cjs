@@ -120,7 +120,20 @@ async function startBot() {
     }
   }
 });
-}
+
+  // ✅ AUTO STATUS SEEN HANDLER
+sock.ev.on('presence.update', async (update) => {
+  if (!config.AUTO_STATUS_SEEN) return;
+  try {
+    const id = update?.id;
+    if (id && id.endsWith('@status.whatsapp.net')) {
+      await sock.readMessages([id]);
+      console.log(`👀 Auto seen status: ${id}`);
+    }
+  } catch (e) {
+    console.log('⚠️ Auto Status Seen Error:', e);
+  }
+});
 
 startBot();
 
