@@ -5,7 +5,7 @@
 
 
 import axios from 'axios';
-import config from '../../config.cjs';
+const config = require('../config.cjs');
 
 const ipStalk = async (m, gss) => {
   const prefix = config.PREFIX;
