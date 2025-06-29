@@ -1,5 +1,5 @@
 import { default as makeWASocket, useMultiFileAuthState, makeCacheableSignalKeyStore, DisconnectReason, fetchLatestBaileysVersion, delay } from '@whiskeysockets/baileys';
-import Pino from 'pino';
+import pino from 'pino';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
