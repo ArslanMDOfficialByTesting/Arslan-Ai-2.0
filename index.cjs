@@ -84,62 +84,65 @@ async function startBot() {
     }
   });
 
+  // ✅ Message Handler
   sock.ev.on('messages.upsert', async ({ messages }) => {
-  const msg = messages[0];
-  if (!msg.message) return;
+    const msg = messages[0];
+    if (!msg.message) return;
 
-  const sender = msg.key.remoteJid;
-  const type = Object.keys(msg.message)[0];
-  const text = msg.message?.conversation || msg.message[type]?.text || '';
+    const sender = msg.key.remoteJid;
+    const type = Object.keys(msg.message)[0];
+    const text = msg.message?.conversation || msg.message[type]?.text || '';
 
-  // ✅ Auto React to messages
-  if (config.AUTO_REACT && !msg.key.fromMe) {
-    try {
-      await sock.sendMessage(msg.key.remoteJid, {
-        react: {
-          text: config.AUTOLIKE_EMOJI || '❤️',
-          key: msg.key
-        }
-      });
-    } catch (e) {
-      console.log('⚠️ Auto React Error:', e);
-    }
-  }
-
-  if (text.startsWith(PREFIX)) {
-    const command = text.slice(PREFIX.length).split(' ')[0].toLowerCase();
-    if (plugins[command]) {
+    // ✅ Auto React
+    if (config.AUTO_REACT && !msg.key.fromMe) {
       try {
-        await plugins[command](sock, msg, sender, text, `${OWNER_NUMBER}@s.whatsapp.net`);
-      } catch (err) {
-        console.error(`❌ Error in ${command}:`, err);
-        await sock.sendMessage(sender, { text: '❌ Command error.' }, { quoted: msg });
+        await sock.sendMessage(msg.key.remoteJid, {
+          react: {
+            text: config.AUTOLIKE_EMOJI || '❤️',
+            key: msg.key
+          }
+        });
+      } catch (e) {
+        console.log('⚠️ Auto React Error:', e);
       }
-    } else {
-      await sock.sendMessage(sender, { text: `❌ Unknown command: *${command}*` }, { quoted: msg });
     }
-  }
-});
 
-  // ✅ AUTO STATUS SEEN HANDLER
-sock.ev.on('presence.update', async (update) => {
-  if (!config.AUTO_STATUS_SEEN) return;
-  try {
-    const id = update?.id;
-    if (id && id.endsWith('@status.whatsapp.net')) {
-      await sock.readMessages([id]);
-      console.log(`👀 Auto seen status: ${id}`);
+    // ✅ Commands
+    if (text.startsWith(PREFIX)) {
+      const command = text.slice(PREFIX.length).split(' ')[0].toLowerCase();
+      if (plugins[command]) {
+        try {
+          await plugins[command](sock, msg, sender, text, `${OWNER_NUMBER}@s.whatsapp.net`);
+        } catch (err) {
+          console.error(`❌ Error in ${command}:`, err);
+          await sock.sendMessage(sender, { text: '❌ Command error.' }, { quoted: msg });
+        }
+      } else {
+        await sock.sendMessage(sender, { text: `❌ Unknown command: *${command}*` }, { quoted: msg });
+      }
     }
-  } catch (e) {
-    console.log('⚠️ Auto Status Seen Error:', e);
-  }
-});
+  });
+
+  // ✅ Auto Status Seen
+  sock.ev.on('presence.update', async (update) => {
+    if (!config.AUTO_STATUS_SEEN) return;
+    try {
+      const id = update?.id;
+      if (id && id.endsWith('@status.whatsapp.net')) {
+        await sock.readMessages([id]);
+        console.log(`👀 Auto seen status: ${id}`);
+      }
+    } catch (e) {
+      console.log('⚠️ Auto Status Seen Error:', e);
+    }
+  });
+}
 
 startBot();
 
-// Fake HTTP server for Render Free Web Service to keep it alive
+// ✅ Render HTTP Keep-Alive
 const http = require('http');
 const PORT = process.env.PORT || 3000;
 http.createServer((req, res) => res.end("Arslan-Ai 2.0 is running")).listen(PORT, () =>
-  console.log(`🌐 HTTP Server running on port ${PORT} (to keep Render alive)`)
+  console.log(`🌐 HTTP Server running on port ${PORT}`)
 );
