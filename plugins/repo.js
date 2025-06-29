@@ -1,4 +1,4 @@
-import config from '../../config.cjs';
+const config = require('../config.cjs');
 import fetch from 'node-fetch'; // Ensure you have this installed
 
 const repo = async (m, sock) => {
