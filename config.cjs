@@ -2,7 +2,7 @@ const fs = require("fs");
 require("dotenv").config();
 
 const config = {
-  SESSION_ID: process.env.SESSION_ID || "ARSL~VqN1AKJa#jDLjkx-nHOyyemmzWymPaOk54TpqwuWYYxW6iGHgeFs",
+  SESSION_ID: process.env.SESSION_ID || "ARSL~QusU3RbI#reMWvdTsaBoL7s8kIFnDuIkmxPo7DW3-QBByWOoy64E",
   PREFIX: process.env.PREFIX || '.',
   BOT_NAME: process.env.BOT_NAME || "<| Arslan-Ai-2.0 𝐕❷🫧",
   BOT: process.env.BOT || "hello 👋",
