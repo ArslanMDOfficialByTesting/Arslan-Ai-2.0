@@ -1,4 +1,4 @@
-import config from '../../config.cjs';
+const config = require('../config.cjs');
 import fetch from 'node-fetch';
 
 const movie = async (m, sock) => {
