@@ -1,7 +1,7 @@
 
 
 import axios from 'axios';
-import config from '../../config.cjs';
+const config = require('../config.cjs');
 
 const quranMedia = async (m, gss) => {
   const prefix = config.PREFIX;
