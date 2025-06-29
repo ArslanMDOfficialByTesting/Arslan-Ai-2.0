@@ -1,4 +1,5 @@
-const config = require('../config.cjs');
+import configModule from '../config.cjs';
+const config = configModule.default || configModule;
 
 const autoreactCommand = async (m, Matrix) => {
   const botNumber = await Matrix.decodeJid(Matrix.user.id);
