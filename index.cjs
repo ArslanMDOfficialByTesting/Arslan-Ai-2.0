@@ -12,12 +12,12 @@ const {
 } = require('@whiskeysockets/baileys');
 
 const config = require('./config.cjs');
-const { SESSION_ID, OWNER_NUMBER, PREFIX } = config;
+const { SESSION_ID, PREFIX } = config;
 
 const pluginDir = path.join(__dirname, 'plugins');
 const plugins = {};
 
-// 📁 Load plugins dynamically
+// ✅ Load all plugins dynamically
 fs.readdirSync(pluginDir).forEach((file) => {
   if (file.endsWith('.js')) {
     const plugin = require(path.join(pluginDir, file));
@@ -27,7 +27,7 @@ fs.readdirSync(pluginDir).forEach((file) => {
   }
 });
 
-// 📦 Load saved session or download from MEGA
+// 📦 Load session from MEGA (ARSL~)
 async function useSession(session_id) {
   const sessionPath = './auth_info';
   if (!fs.existsSync(sessionPath)) fs.mkdirSync(sessionPath);
@@ -45,7 +45,7 @@ async function useSession(session_id) {
   return await useMultiFileAuthState(sessionPath);
 }
 
-// 🚀 Start Bot
+// 🌐 START BOT
 async function startBot() {
   const { state, saveCreds } = await useSession(SESSION_ID);
   const { version } = await fetchLatestBaileysVersion();
@@ -54,7 +54,7 @@ async function startBot() {
     version,
     printQRInTerminal: false,
     logger: pino({ level: 'silent' }),
-    browser: ['Arslan-Ai', 'Safari', '1.0'],
+    browser: ['Arslan-Ai-2.0', 'Chrome', '1.0'],
     auth: {
       creds: state.creds,
       keys: makeCacheableSignalKeyStore(state.keys, pino({ level: 'silent' }))
@@ -62,6 +62,8 @@ async function startBot() {
   });
 
   sock.ev.on('creds.update', saveCreds);
+
+  let OWNER_NUMBER = ''; // Dynamic owner
 
   sock.ev.on('connection.update', async ({ connection, lastDisconnect }) => {
     if (connection === 'close') {
@@ -73,9 +75,11 @@ async function startBot() {
         await startBot();
       }
     } else if (connection === 'open') {
-      console.log('✅ Bot connected as:', sock.user.id);
+      OWNER_NUMBER = sock.user.id.split('@')[0];
+      console.log(`✅ Bot connected as: ${sock.user.id}`);
+
       await sock.sendMessage(`${OWNER_NUMBER}@s.whatsapp.net`, {
-        text: `✅ *Arslan-Ai 2.0 is now connected!*\n\n👑 Owner: wa.me/${OWNER_NUMBER}`
+        text: `✅ *Arslan-Ai 2.0 is now connected!*\n\n👑 *Dynamic Owner:* wa.me/${OWNER_NUMBER}`
       });
     }
   });
@@ -89,16 +93,17 @@ async function startBot() {
     const text = msg.message?.conversation || msg.message[type]?.text || '';
 
     if (text.startsWith(PREFIX)) {
-      const cmd = text.slice(PREFIX.length).trim().toLowerCase();
-      if (plugins[cmd]) {
+      const command = text.slice(PREFIX.length).split(' ')[0].toLowerCase();
+      if (plugins[command]) {
         try {
-          await plugins[cmd](sock, msg, sender, text);
+          // ⏩ Pass owner ID to plugin handler
+          await plugins[command](sock, msg, sender, text, `${OWNER_NUMBER}@s.whatsapp.net`);
         } catch (err) {
-          console.error(`❌ Error in ${cmd}:`, err);
+          console.error(`❌ Error in ${command}:`, err);
           await sock.sendMessage(sender, { text: '❌ Command error.' }, { quoted: msg });
         }
       } else {
-        await sock.sendMessage(sender, { text: `❌ Unknown command: *${cmd}*` }, { quoted: msg });
+        await sock.sendMessage(sender, { text: `❌ Unknown command: *${command}*` }, { quoted: msg });
       }
     }
   });
