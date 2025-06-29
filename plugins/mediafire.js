@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
 
-import config from '../../config.cjs'; // Ensure config.cjs has your bot settings
+const config = require('../config.cjs'); // Ensure config.cjs has your bot settings
 
 const downloadMediaFireFile = async (m, gss) => {
 
