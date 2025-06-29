@@ -3,7 +3,7 @@ const config = require('../config.cjs');
 module.exports = {
   command: 'autostatus',
   handler: async (sock, m, sender, text, ownerId) => {
-    if (sender !== ownerId) {
+    if (!sender.includes(ownerId.split('@')[0])) {
       return sock.sendMessage(m.from, { text: "❌ *Only owner can use this command.*" }, { quoted: m });
     }
 
