@@ -62,31 +62,38 @@ async function startBot() {
   });
 
   sock.ev.on('messages.upsert', async ({ messages }) => {
-    const msg = messages[0];
-    if (!msg.message || msg.key.fromMe) return;
+  const msg = messages[0];
+  console.log("📥 New Message Received:", JSON.stringify(msg, null, 2));
 
-    const sender = msg.key.remoteJid;
-    const type = Object.keys(msg.message)[0];
-    const text = msg.message?.conversation || msg.message[type]?.text || '';
+  if (!msg.message || msg.key.fromMe) {
+    console.log("⛔ Message has no content or from me. Skipping.");
+    return;
+  }
 
-    if (text.startsWith(config.PREFIX)) {
-      const cmd = text.slice(config.PREFIX.length).trim().toLowerCase();
-      switch (cmd) {
-        case 'ping':
-          await sock.sendMessage(sender, { text: '🏓 Pong!' }, { quoted: msg });
-          break;
-        case 'owner':
-          await sock.sendMessage(sender, {
-            text: `👑 My Owner: wa.me/${config.OWNER_NUMBER}`
-          }, { quoted: msg });
-          break;
-        default:
-          await sock.sendMessage(sender, {
-            text: `❌ Unknown command: *${cmd}*`
-          }, { quoted: msg });
-      }
+  const sender = msg.key.remoteJid;
+  const type = Object.keys(msg.message)[0];
+  const text = msg.message?.conversation || msg.message[type]?.text || '';
+
+  console.log("📤 Text:", text);
+
+  if (text.startsWith(config.PREFIX)) {
+    const cmd = text.slice(config.PREFIX.length).trim().toLowerCase();
+    console.log("🔍 Command received:", cmd);
+
+    switch (cmd) {
+      case 'ping':
+        await sock.sendMessage(sender, { text: '*Pong!* 🏓' }, { quoted: msg });
+        break;
+
+      case 'owner':
+        await sock.sendMessage(sender, { text: `👑 My Owner: wa.me/${config.OWNER_NUMBER}` }, { quoted: msg });
+        break;
+
+      default:
+        await sock.sendMessage(sender, { text: `❌ Unknown command: *${cmd}*` }, { quoted: msg });
     }
-  });
-}
-
+  } else {
+    console.log("❌ Message does not start with prefix:", config.PREFIX);
+  }
+});
 startBot();
