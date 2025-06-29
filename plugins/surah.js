@@ -1,5 +1,4 @@
-
-import config from "../../config.cjs";
+const config = require('../config.cjs');
 import axios from "axios";
 
 const surahCmd = async (m, gss) => {
