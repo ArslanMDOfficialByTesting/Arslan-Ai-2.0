@@ -2,9 +2,10 @@
   "name": "Arslan-Ai-2.0",
   "version": "2",
   "description": "Arslan-MD inc",
+  {
   "main": "index.cjs",
   "scripts": {
-  "start": "node index.cjs",
+    "start": "pm2 start index.cjs --name Arslan-Ai-2.0",
   "stop": "pm2 stop Arslan-Ai-2.0",
   "restart": "pm2 restart Arslan-Ai-2.0"
 },
