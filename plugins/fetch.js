@@ -1,7 +1,7 @@
 
 
 import fetch from 'node-fetch';
-import config from '../../config.cjs';
+const config = require('../config.cjs');
 
 const fetchData = async (m, Matrix) => {
   const prefix = config.PREFIX;
