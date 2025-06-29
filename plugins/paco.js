@@ -1,1 +1,34 @@
-(function(_0x4e343f,_0x175a73){const _0x2e20b6=_0x376a,_0x4a0990=_0x4e343f();while(!![]){try{const _0x2b8a0d=parseInt(_0x2e20b6(0x126))/0x1+parseInt(_0x2e20b6(0x11e))/0x2+-parseInt(_0x2e20b6(0x134))/0x3*(-parseInt(_0x2e20b6(0x123))/0x4)+-parseInt(_0x2e20b6(0x130))/0x5+-parseInt(_0x2e20b6(0x12d))/0x6+parseInt(_0x2e20b6(0x11f))/0x7*(parseInt(_0x2e20b6(0x135))/0x8)+parseInt(_0x2e20b6(0x121))/0x9;if(_0x2b8a0d===_0x175a73)break;else _0x4a0990['push'](_0x4a0990['shift']());}catch(_0x28341d){_0x4a0990['push'](_0x4a0990['shift']());}}}(_0x172c,0x74a4c));import _0x284800 from'../../config.cjs';const ping=async(_0x212d45,_0x4dcc41)=>{const _0x5d4d51=_0x376a,_0x3b18a9=_0x284800['PREFIX'],_0x15c85c=_0x212d45[_0x5d4d51(0x13d)][_0x5d4d51(0x122)](_0x3b18a9)?_0x212d45[_0x5d4d51(0x13d)][_0x5d4d51(0x131)](_0x3b18a9[_0x5d4d51(0x12e)])[_0x5d4d51(0x127)]('\x20')[0x0][_0x5d4d51(0x13b)]():'';if(_0x15c85c===_0x5d4d51(0x11b)){const _0x41d1ac=performance[_0x5d4d51(0x132)]();await _0x212d45[_0x5d4d51(0x133)]('⏳'),await _0x4dcc41[_0x5d4d51(0x139)](_0x5d4d51(0x138),_0x212d45[_0x5d4d51(0x12c)]),await new Promise(_0x138015=>setTimeout(_0x138015,0x5dc)),await _0x4dcc41['sendPresenceUpdate'](_0x5d4d51(0x12f),_0x212d45[_0x5d4d51(0x12c)]);const _0x30dd76=performance[_0x5d4d51(0x132)](),_0x8f8555=Math[_0x5d4d51(0x13c)](_0x30dd76-_0x41d1ac),_0x43d97d=(_0x5d4d51(0x12a)+_0x8f8555+_0x5d4d51(0x11d)+getFancyMessage()+_0x5d4d51(0x13a))[_0x5d4d51(0x136)]();let _0x23ea47;try{_0x23ea47=await _0x4dcc41[_0x5d4d51(0x11c)](_0x212d45[_0x5d4d51(0x128)],_0x5d4d51(0x11a));}catch(_0x205b68){_0x23ea47=_0x5d4d51(0x120);}await _0x4dcc41[_0x5d4d51(0x137)](_0x212d45[_0x5d4d51(0x12c)],{'image':{'url':_0x23ea47},'caption':_0x43d97d},{'quoted':_0x212d45});}};function getFancyMessage(){const _0x226e4e=_0x376a,_0x48e7aa=[_0x226e4e(0x129),_0x226e4e(0x124),'🚀\x20Full\x20throttle\x20response!',_0x226e4e(0x125),'🌐\x20Instant\x20like\x20magic!'];return _0x48e7aa[Math['floor'](Math[_0x226e4e(0x12b)]()*_0x48e7aa[_0x226e4e(0x12e)])];}function _0x172c(){const _0x4f8d61=['4428315kfLass','slice','now','React','1551WuDJpG','331736mHLcru','trim','sendMessage','composing','sendPresenceUpdate','\x0a╰━━━━━━━━━━━━━━╯\x0a\x20\x20\x20\x20','toLowerCase','round','body','image','ping','profilePictureUrl','\x20ms\x0a┃\x20','540100qkKnxP','91NZAjVy','https://i.ibb.co/7yzjwvJ/default.jpg','1957536KhPEkn','startsWith','1356HUbHBA','💨\x20Too\x20fast\x20to\x20catch!','✨\x20Lightning\x20mode\x20activated!','599100vsqaPN','split','sender','⚡\x20Zooming\x20through\x20the\x20wires!','\x0a╭━━━〔\x20*PONG!*\x20〕━━━╮\x0a┃\x20⚡\x20*Status:*\x20Online\x0a┃\x20⏱️\x20*Response:*\x20','random','from','2625318nodADD','length','paused'];_0x172c=function(){return _0x4f8d61;};return _0x172c();}function _0x376a(_0x4f7afc,_0x1c0902){const _0x172c5f=_0x172c();return _0x376a=function(_0x376a75,_0x1054f8){_0x376a75=_0x376a75-0x11a;let _0x16ba91=_0x172c5f[_0x376a75];return _0x16ba91;},_0x376a(_0x4f7afc,_0x1c0902);}export default ping;
+import _0x284800 from '../../config.cjs';
+const ping = async (_0x212d45, _0x4dcc41) => {
+  const _0x3b18a9 = _0x284800.PREFIX;
+  const _0x15c85c = _0x212d45.body.startsWith(_0x3b18a9) ? _0x212d45.body.slice(_0x3b18a9.length).split(" ")[0x0].toLowerCase() : '';
+  if (_0x15c85c === "ping") {
+    const _0x41d1ac = performance.now();
+    await _0x212d45.React('⏳');
+    await _0x4dcc41.sendPresenceUpdate("composing", _0x212d45.from);
+    await new Promise(_0x138015 => setTimeout(_0x138015, 0x5dc));
+    await _0x4dcc41.sendPresenceUpdate("paused", _0x212d45.from);
+    const _0x30dd76 = performance.now();
+    const _0x8f8555 = Math.round(_0x30dd76 - _0x41d1ac);
+    const _0x43d97d = ("\n╭━━━〔 *PONG!* 〕━━━╮\n┃ ⚡ *Status:* Online\n┃ ⏱️ *Response:* " + _0x8f8555 + " ms\n┃ " + getFancyMessage() + "\n╰━━━━━━━━━━━━━━╯\n    ").trim();
+    let _0x23ea47;
+    try {
+      _0x23ea47 = await _0x4dcc41.profilePictureUrl(_0x212d45.sender, "image");
+    } catch (_0x205b68) {
+      _0x23ea47 = "https://i.ibb.co/7yzjwvJ/default.jpg";
+    }
+    await _0x4dcc41.sendMessage(_0x212d45.from, {
+      'image': {
+        'url': _0x23ea47
+      },
+      'caption': _0x43d97d
+    }, {
+      'quoted': _0x212d45
+    });
+  }
+};
+function getFancyMessage() {
+  const _0x48e7aa = ["⚡ Zooming through the wires!", "💨 Too fast to catch!", "🚀 Full throttle response!", "✨ Lightning mode activated!", "🌐 Instant like magic!"];
+  return _0x48e7aa[Math.floor(Math.random() * _0x48e7aa.length)];
+}
+export default ping;
