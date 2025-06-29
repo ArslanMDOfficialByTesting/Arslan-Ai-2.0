@@ -1,9 +1,14 @@
+import { default as makeWASocket, useMultiFileAuthState, makeCacheableSignalKeyStore, DisconnectReason, fetchLatestBaileysVersion, delay } from '@whiskeysockets/baileys';
+import Pino from 'pino';
 import fs from 'fs';
-import pino from 'pino';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { Boom } from '@hapi/boom';
-import makeWASocket, { useMultiFileAuthState, makeCacheableSignalKeyStore, fetchLatestBaileysVersion, DisconnectReason, delay } from '@whiskeysockets/baileys';
-import express from 'express';
 import config from './config.cjs';
+
+// 👇 These two must be added below imports
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const { SESSION_ID, OWNER_NUMBER, BOT_NAME } = config;
 
